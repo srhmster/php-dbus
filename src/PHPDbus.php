@@ -17,13 +17,22 @@ class PHPDbus
     private $service;
     
     /**
+     * Data converter
+     *
+     * @var Marshaller
+     */
+    private $marshaller;
+    
+    /**
      * Constructor
      *
      * @param string $service
+     * @param Marshaller|null $marshaller Object of data converter
      */
-    public function __construct($service)
+    public function __construct($service, Marshaller $marshaller = null)
     {
         $this->service = $service;
+        $this->marshaller = $marshaller ?: new DbusMarshaller();
     }
     
     /**
@@ -33,19 +42,28 @@ class PHPDbus
      * @param string $interface
      * @param string $method
      * @param string|null $properties
-     * @return string|null
+     * @return array|string|int|float|bool|null
      * @throws Exception
      */
     public function call($objectPath, $interface, $method, $properties = null)
     {
-        return $this->execute(sprintf(
+        $response = $this->execute(sprintf(
             'busctl call %s %s %s %s %s',
             $this->service,
             $objectPath,
             $interface,
             $method,
-            $properties
+            $this->marshaller->marshal($properties)
         ));
+        
+        if (!is_null($response)) {
+            $data = explode(' ', $response);
+            $signature = array_shift($data);
+            
+            return $this->marshaller->unmarshal($signature, $data);
+        }
+        
+        return null;
     }
     
     /**
@@ -66,7 +84,7 @@ class PHPDbus
             $objectPath,
             $interface,
             $signal,
-            $value
+            $this->marshaller->marshal($value)
         ));
     }
     
@@ -76,18 +94,27 @@ class PHPDbus
      * @param string $objectPath
      * @param string $interface
      * @param string $property
-     * @return string|null
+     * @return array|string|int|float|bool|null
      * @throws Exception
      */
     public function getProperty($objectPath, $interface, $property)
     {
-        return $this->execute(sprintf(
+        $response = $this->execute(sprintf(
             'busctl get-property %s %s %s %s',
             $this->service,
             $objectPath,
             $interface,
             $property
         ));
+        
+        if (!is_null($response)) {
+            $data = explode(' ', $response);
+            $signature = array_shift($data);
+            
+            return $this->marshaller->unmarshal($signature, $data);
+        }
+        
+        return null;
     }
     
     /**
@@ -108,7 +135,7 @@ class PHPDbus
             $objectPath,
             $interface,
             $property,
-            $value
+            $this->marshaller->marshal($value)
         ));
     }
     
