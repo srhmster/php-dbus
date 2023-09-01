@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpDbus;
+namespace PhpDbus\Marshallers;
 
 /**
  * Data converter interface

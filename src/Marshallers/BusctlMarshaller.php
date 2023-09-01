@@ -1,11 +1,11 @@
 <?php
 
-namespace PhpDbus;
+namespace PhpDbus\Marshallers;
 
 /**
- * Dbus data converter
+ * Busctl data converter
  */
-class DbusMarshaller implements Marshaller
+class BusctlMarshaller implements Marshaller
 {
     /**
      * @inheritdoc

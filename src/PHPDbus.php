@@ -3,6 +3,10 @@
 namespace PhpDbus;
 
 use Exception;
+use PhpDbus\Commands\BusctlCommand;
+use PhpDbus\Commands\Command;
+use PhpDbus\Marshallers\BusctlMarshaller;
+use PhpDbus\Marshallers\Marshaller;
 
 /**
  * PHP Dbus library main class
@@ -24,15 +28,27 @@ class PHPDbus
     private $marshaller;
     
     /**
+     * Console command
+     *
+     * @var Command
+     */
+    private $command;
+    
+    /**
      * Constructor
      *
      * @param string $service
      * @param Marshaller|null $marshaller Object of data converter
+     * @param Command|null $command Object of console command
      */
-    public function __construct($service, Marshaller $marshaller = null)
-    {
+    public function __construct(
+        $service,
+        Marshaller $marshaller = null,
+        Command $command = null
+    ) {
         $this->service = $service;
-        $this->marshaller = $marshaller ?: new DbusMarshaller();
+        $this->marshaller = $marshaller ?: new BusctlMarshaller();
+        $this->command = $command ?: new BusctlCommand();
     }
     
     /**
@@ -42,21 +58,29 @@ class PHPDbus
      * @param string $interface
      * @param string $method
      * @param string|null $properties
+     * @param array $options
      * @return array|string|int|float|bool|null
      * @throws Exception
      */
-    public function call($objectPath, $interface, $method, $properties = null)
-    {
-        $response = $this->execute(sprintf(
-            'busctl call %s %s %s %s %s',
-            $this->service,
-            $objectPath,
-            $interface,
-            $method,
-            $this->marshaller->marshal($properties)
-        ));
+    public function call(
+        $objectPath,
+        $interface,
+        $method,
+        $properties = null,
+        $options = []
+    ) {
+        $response = $this->command
+            ->setName('call')
+            ->addOptions($options)
+            ->execute([
+                $this->service,
+                $objectPath,
+                $interface,
+                $method,
+                $this->marshaller->marshal($properties)
+            ]);
         
-        if (!is_null($response)) {
+        if (!is_null($response) && count($response) > 1) {
             $data = explode(' ', $response);
             $signature = array_shift($data);
             
@@ -73,19 +97,27 @@ class PHPDbus
      * @param string $interface
      * @param string $signal
      * @param string|null $value
+     * @param array $options
      * @return void
      * @throws Exception
      */
-    public function emit($objectPath, $interface, $signal, $value = null)
-    {
-        $this->execute(sprintf(
-            'busctl emit %s %s %s %s %s',
-            $this->service,
-            $objectPath,
-            $interface,
-            $signal,
-            $this->marshaller->marshal($value)
-        ));
+    public function emit(
+        $objectPath,
+        $interface,
+        $signal,
+        $value = null,
+        $options = []
+    ) {
+        $this->command
+            ->setName('emit')
+            ->addOptions($options)
+            ->execute([
+                $this->service,
+                $objectPath,
+                $interface,
+                $signal,
+                $this->marshaller->marshal($value)
+            ]);
     }
     
     /**
@@ -93,21 +125,28 @@ class PHPDbus
      *
      * @param string $objectPath
      * @param string $interface
-     * @param string $property
+     * @param string $name
+     * @param array $options
      * @return array|string|int|float|bool|null
      * @throws Exception
      */
-    public function getProperty($objectPath, $interface, $property)
-    {
-        $response = $this->execute(sprintf(
-            'busctl get-property %s %s %s %s',
-            $this->service,
-            $objectPath,
-            $interface,
-            $property
-        ));
+    public function getProperty(
+        $objectPath,
+        $interface,
+        $name,
+        $options = []
+    ) {
+        $response = $this->command
+            ->setName('get-property')
+            ->addOptions($options)
+            ->execute([
+                $this->service,
+                $objectPath,
+                $interface,
+                $name
+            ]);
         
-        if (!is_null($response)) {
+        if (!is_null($response) && count($response) > 1) {
             $data = explode(' ', $response);
             $signature = array_shift($data);
             
@@ -122,48 +161,28 @@ class PHPDbus
      *
      * @param string $objectPath
      * @param string $interface
-     * @param string $property
+     * @param string $name
      * @param string|null $value
+     * @param array $options
      * @return void
      * @throws Exception
      */
-    public function setProperty($objectPath, $interface, $property, $value = null)
-    {
-        $this->execute(sprintf(
-            'busctl set-property %s %s %s %s %s',
-            $this->service,
-            $objectPath,
-            $interface,
-            $property,
-            $this->marshaller->marshal($value)
-        ));
-    }
-    
-    /**
-     * Execute console command
-     *
-     * @param string $command
-     * @return string|null
-     * @throws Exception
-     */
-    private function execute($command)
-    {
-        $response = null;
-        $code = null;
-        
-        exec($command . ' 2>&1 ', $response, $code);
-        if ($code !== 0) {
-            throw new Exception($response[0], $code);
-        }
-        
-        if (isset($response) && count($response) > 0) {
-            if (count($response) === 1) {
-                $response = $response[0];
-            }
-        } else {
-            $response = null;
-        }
-        
-        return $response;
+    public function setProperty(
+        $objectPath,
+        $interface,
+        $name,
+        $value = null,
+        $options = []
+    ) {
+        $this->command
+            ->setName('set-property')
+            ->addOptions($options)
+            ->execute([
+                $this->service,
+                $objectPath,
+                $interface,
+                $name,
+                $this->marshaller->marshal($value)
+            ]);
     }
 }
