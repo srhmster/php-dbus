@@ -7,6 +7,21 @@ namespace Srhmster\PhpDbus\Marshallers;
  */
 class BusctlMarshaller implements Marshaller
 {
+    // Data types in the signature
+    const STRING = 's';
+    const OBJECT_PATH = 'o';
+    const BYTE = 'y';
+    const INT16 = 'n';
+    const UINT16 = 'q';
+    const INT32 = 'i';
+    const UINT32 = 'u';
+    const INT64 = 'x';
+    const UINT64 = 't';
+    const DOUBLE = 'd';
+    const BOOL = 'b';
+    const VARIANT = 'v';
+    const ARR = 'a';
+
     /**
      * @inheritdoc
      */
@@ -25,24 +40,24 @@ class BusctlMarshaller implements Marshaller
             $response = null;
         
             switch ($signature) {
-                case 's': // string
-                case 'o': // object path
+                case self::STRING:
+                case self::OBJECT_PATH:
                     $response = str_replace('"', '', array_shift($data));
                     break;
-                case 'y': // byte
-                case 'n': // int16
-                case 'q': // uint16
-                case 'i': // int32
-                case 'u': // uint32
-                case 'x': // int64
-                case 't': // uint64
-                case 'd': // double
+                case self::BYTE:
+                case self::INT16:
+                case self::UINT16:
+                case self::INT32:
+                case self::UINT32:
+                case self::INT64:
+                case self::UINT64:
+                case self::DOUBLE:
                     $response = array_shift($data) * 1;
                     break;
-                case 'b': // bool
+                case self::BOOL:
                     $response = array_shift($data) === 'true';
                     break;
-                case 'v': // variant
+                case self::VARIANT:
                     $response = $this->unmarshal(array_shift($data), $data);
                     break;
             }
@@ -78,7 +93,7 @@ class BusctlMarshaller implements Marshaller
                     $position = $pEnd;
                 
                     break;
-                case 'a':
+                case self::ARR:
                     // Find the type of array elements
                     $stPosition = $this
                         ->findArraySubtypePosition($signature, $position);
@@ -153,7 +168,7 @@ class BusctlMarshaller implements Marshaller
                 $position['end'] = strripos($signature, '}') - 1;
                 
                 break;
-            case 'a':
+            case self::ARR:
                 $position['start'] = $pStart + 1;
                 $position['end'] = $this->findArraySubtypePosition(
                         $signature,
