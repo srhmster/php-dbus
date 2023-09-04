@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpDbus\Marshallers;
+namespace Srhmster\PhpDbus\Marshallers;
 
 /**
  * Busctl data converter

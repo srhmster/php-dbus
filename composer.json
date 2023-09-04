@@ -1,0 +1,24 @@
+{
+  "name": "srhmster/php-dbus",
+  "description": "PHP library for interact with DBus",
+  "type": "library",
+  "keywords": ["php", "dbus", "busctl"],
+  "homepage": "https://github.com/srhmster/php-dbus",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Roman Nagovitcyn",
+      "email": "srhamster@yandex.ru",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=5.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Srhmster\\PhpDbus\\": "src/"
+    }
+  },
+  "minimum-stability": "stable"
+}

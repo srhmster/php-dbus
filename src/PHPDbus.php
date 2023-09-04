@@ -1,18 +1,24 @@
 <?php
 
-namespace PhpDbus;
+namespace Srhmster\PhpDbus;
 
 use Exception;
-use PhpDbus\Commands\BusctlCommand;
-use PhpDbus\Commands\Command;
-use PhpDbus\Marshallers\BusctlMarshaller;
-use PhpDbus\Marshallers\Marshaller;
+use Srhmster\PhpDbus\Commands\BusctlCommand;
+use Srhmster\PhpDbus\Commands\Command;
+use Srhmster\PhpDbus\Marshallers\BusctlMarshaller;
+use Srhmster\PhpDbus\Marshallers\Marshaller;
 
 /**
  * PHP Dbus library main class
  */
 class PHPDbus
 {
+    // Method names
+    const CALL = 'call';
+    const EMIT = 'emit';
+    const GET_PROPERTY = 'get-property';
+    const SET_PROPERTY = 'set-property';
+
     /**
      * Dbus service name
      *
@@ -70,7 +76,7 @@ class PHPDbus
         $options = []
     ) {
         $response = $this->command
-            ->setName('call')
+            ->setName(self::CALL)
             ->addOptions($options)
             ->execute([
                 $this->service,
@@ -79,8 +85,8 @@ class PHPDbus
                 $method,
                 $this->marshaller->marshal($properties)
             ]);
-        
-        if (!is_null($response) && count($response) > 1) {
+
+        if (!is_null($response)) {
             $data = explode(' ', $response);
             $signature = array_shift($data);
             
@@ -109,7 +115,7 @@ class PHPDbus
         $options = []
     ) {
         $this->command
-            ->setName('emit')
+            ->setName(self::EMIT)
             ->addOptions($options)
             ->execute([
                 $this->service,
@@ -137,7 +143,7 @@ class PHPDbus
         $options = []
     ) {
         $response = $this->command
-            ->setName('get-property')
+            ->setName(self::GET_PROPERTY)
             ->addOptions($options)
             ->execute([
                 $this->service,
@@ -146,7 +152,7 @@ class PHPDbus
                 $name
             ]);
         
-        if (!is_null($response) && count($response) > 1) {
+        if (!is_null($response)) {
             $data = explode(' ', $response);
             $signature = array_shift($data);
             
@@ -175,7 +181,7 @@ class PHPDbus
         $options = []
     ) {
         $this->command
-            ->setName('set-property')
+            ->setName(self::SET_PROPERTY)
             ->addOptions($options)
             ->execute([
                 $this->service,

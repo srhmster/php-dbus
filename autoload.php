@@ -1,7 +1,8 @@
 <?php
 
 spl_autoload_register(function ($className) {
-    $className = str_replace('PhpDbus\\', '', $className);
+    $prefix = 'Srhmster\PhpDbus\\';
+    $className = str_replace($prefix, '', $className);
     
     $path = '';
     foreach (explode('\\', $className) as $item) {

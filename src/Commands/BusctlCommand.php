@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpDbus\Commands;
+namespace Srhmster\PhpDbus\Commands;
 
 use Exception;
 

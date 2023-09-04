@@ -5,6 +5,14 @@ PHP library for interact with DBus. By default, the console utility
 
 # Basic usage
 
+### Composer
+This library is designed for use with the `composer` PHP dependency manager. Simply add the `srhmster/php-dbus` package 
+to get started:
+
+````
+composer require srhmster/php-dbus
+````
+
 ### Manually
 If you don't have composer available, then simply download the code
 
@@ -18,36 +26,6 @@ and include `autoload.php`
 <?php
 
 require_once __DIR__ . '/vendor/srhmster/php-dbus/autoload.php';
-````
-
-### Custom console utility
-
-If you do not want to use the `basctl` utility, you can override the `Marshaller` 
-and `Command` classes when initializing the main library class
-
-````php
-<?php
-
-use PhpDbus\PHPDbus;
-use PhpDbus\Marshallers\Marshaller;
-use PhpDbus\Commands\Command;
-
-require_once __DIR__ . '/your-path-to/autoload.php';
-
-class CustomMarshaller implements Marshaller
-{
-    ...
-}
-
-class CustomCommand implements Command
-{
-    ...
-}
-
-$marshaller = new CustomMarshaller();
-$command = new CustomCommand();
-
-$dbus = new PHPDbus('example.dbus.serviceName', $marshaller, $command);
 ````
 
 # Available methods
