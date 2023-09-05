@@ -25,12 +25,22 @@ abstract class BusctlDataObject
     protected $value;
     
     /**
+     * Get data object signature
+     *
+     * @return string
+     */
+    public function getSignature()
+    {
+        return $this->signature;
+    }
+    
+    /**
      * Get data object value
      *
-     * @param bool $useSignature
+     * @param bool $withSignature
      * @return mixed
      */
-    abstract public function get($useSignature = false);
+    abstract public function getValue($withSignature = false);
     
     /**
      * Create string data object
@@ -163,5 +173,16 @@ abstract class BusctlDataObject
     public static function v(BusctlDataObject $value)
     {
         return new VariantDataObject($value);
+    }
+    
+    /**
+     * Create struct data object
+     *
+     * @param BusctlDataObject|BusctlDataObject[] $value
+     * @return StructDataObject
+     */
+    public static function r($value)
+    {
+        return new StructDataObject($value);
     }
 }

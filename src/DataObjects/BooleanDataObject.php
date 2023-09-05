@@ -23,11 +23,11 @@ class BooleanDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function get($useSignature = false)
+    public function getValue($withSignature = false)
     {
         $value = $this->value === true ? 'true' : 'false';
         
-        return $useSignature === true
+        return $withSignature === true
             ? $this->signature . ' ' . $value
             : $value;
     }

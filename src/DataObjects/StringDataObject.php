@@ -23,9 +23,9 @@ class StringDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function get($useSignature = false)
+    public function getValue($withSignature = false)
     {
-        return $useSignature === true
+        return $withSignature === true
             ? $this->signature . ' "' . $this->value . '"'
             : '"' . $this->value . '"';
     }

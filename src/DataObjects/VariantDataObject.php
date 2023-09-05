@@ -29,10 +29,10 @@ class VariantDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function get($useSignature = false)
+    public function getValue($withSignature = false)
     {
-        return $useSignature === true
-            ? $this->signature . ' ' . $this->value->get()
-            : $this->value->get();
+        return $withSignature === true
+            ? $this->signature . ' ' . $this->value->getValue(true)
+            : $this->value->getValue(true);
     }
 }
