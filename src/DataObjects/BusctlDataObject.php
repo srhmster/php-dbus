@@ -185,4 +185,16 @@ abstract class BusctlDataObject
     {
         return new StructDataObject($value);
     }
+    
+    /**
+     * Create array data object
+     *
+     * @param BusctlDataObject[] $value
+     * @return ArrayDataObject
+     * @throws Exception
+     */
+    public static function a($value)
+    {
+        return new ArrayDataObject($value);
+    }
 }
