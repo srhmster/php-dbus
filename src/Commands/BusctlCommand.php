@@ -100,7 +100,7 @@ class BusctlCommand implements Command
             return $response;
         }
     
-        return $response;
+        return null;
     }
     
     /**

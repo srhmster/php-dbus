@@ -63,7 +63,7 @@ class PHPDbus
      * @param string $objectPath
      * @param string $interface
      * @param string $method
-     * @param string|null $properties
+     * @param mixed|null $properties
      * @param array $options
      * @return array|string|int|float|bool|null
      * @throws Exception
@@ -102,7 +102,7 @@ class PHPDbus
      * @param string $objectPath
      * @param string $interface
      * @param string $signal
-     * @param string|null $value
+     * @param mixed|null $value
      * @param array $options
      * @return void
      * @throws Exception
@@ -168,7 +168,7 @@ class PHPDbus
      * @param string $objectPath
      * @param string $interface
      * @param string $name
-     * @param string|null $value
+     * @param mixed|null $value
      * @param array $options
      * @return void
      * @throws Exception
