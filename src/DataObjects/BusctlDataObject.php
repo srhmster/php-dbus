@@ -197,4 +197,16 @@ abstract class BusctlDataObject
     {
         return new ArrayDataObject($value);
     }
+    
+    /**
+     * Create map data object
+     *
+     * @param BusctlDataObject[][] $value
+     * @return MapDataObject
+     * @throws Exception
+     */
+    public static function e($value)
+    {
+        return new MapDataObject($value);
+    }
 }
