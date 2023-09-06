@@ -12,16 +12,17 @@ class ArrayDataObject extends BusctlDataObject
     /**
      * Constructor
      *
+     * @param string $signature
      * @param BusctlDataObject[] $value
      * @throws Exception
      */
-    public function __construct($value)
+    public function __construct($signature, $value)
     {
         if (!$this->isCorrectValues($value)) {
             throw new Exception('Incorrect data object signature inside array');
         }
         
-        $this->signature = 'a' . $value[0]->getSignature();
+        $this->signature = $signature . $value[0]->getSignature();
         $this->value = $value;
     }
     

@@ -195,7 +195,7 @@ abstract class BusctlDataObject
      */
     public static function a($value)
     {
-        return new ArrayDataObject($value);
+        return new ArrayDataObject(BusctlMarshaller::ARR, $value);
     }
     
     /**
@@ -207,6 +207,6 @@ abstract class BusctlDataObject
      */
     public static function e($value)
     {
-        return new MapDataObject($value);
+        return new MapDataObject(BusctlMarshaller::ARR, $value);
     }
 }

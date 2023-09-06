@@ -12,10 +12,11 @@ class MapDataObject extends BusctlDataObject
     /**
      * Constructor
      *
+     * @param string $signature
      * @param BusctlDataObject[][] $value
      * @throws Exception
      */
-    public function __construct($value)
+    public function __construct($signature, $value)
     {
         if (!$this->isCorrectValues($value)) {
             throw new Exception('Incorrect data object signature inside array');
@@ -31,7 +32,7 @@ class MapDataObject extends BusctlDataObject
         $keySignature = $firstItem['key']->getSignature();
         $valueSignature = $firstItem['value']->getSignature();
         
-        $this->signature = 'a{' . $keySignature . $valueSignature . '}';
+        $this->signature = $signature . '{' . $keySignature . $valueSignature . '}';
         $this->value = $value;
     }
     
