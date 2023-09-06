@@ -17,7 +17,7 @@ class ArrayDataObject extends BusctlDataObject
      */
     public function __construct($value)
     {
-        if ($this->checkValuesSignature($value)) {
+        if (!$this->isCorrectValues($value)) {
             throw new Exception('Incorrect data object signature inside array');
         }
         
@@ -46,9 +46,9 @@ class ArrayDataObject extends BusctlDataObject
      * @param BusctlDataObject[] $dataObjects
      * @return bool
      */
-    private function checkValuesSignature($dataObjects)
+    private function isCorrectValues($dataObjects)
     {
-        $signature = $dataObjects[0]->getSignature();
+        $signature = array_shift($dataObjects)->getSignature();
         
         foreach ($dataObjects as $dataObject) {
             if ($dataObject->getSignature() !== $signature) {
