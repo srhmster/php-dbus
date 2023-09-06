@@ -2,6 +2,8 @@
 
 namespace Srhmster\PhpDbus\Marshallers;
 
+use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
+
 /**
  * Busctl data converter
  */
@@ -21,13 +23,27 @@ class BusctlMarshaller implements Marshaller
     const BOOL = 'b';
     const VARIANT = 'v';
     const ARR = 'a';
-
+    
     /**
-     * @inheritdoc
+     * Convert PHP data to Dbus format
+     *
+     * @param BusctlDataObject|BusctlDataObject[] $data
+     * @return string
      */
     public function marshal($data)
     {
-        return $data;
+        if ($data instanceof BusctlDataObject) {
+            return $data->getValue(true);
+        }
+        
+        $signature = '';
+        $value = '';
+        foreach ($data as $dataObject) {
+            $signature .= $dataObject->getSignature();
+            $value .= $dataObject->getValue() . ' ';
+        }
+        
+        return $signature . ' ' . $value;
     }
     
     /**
