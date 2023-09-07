@@ -27,11 +27,15 @@ class BusctlMarshaller implements Marshaller
     /**
      * Convert PHP data to Dbus format
      *
-     * @param BusctlDataObject|BusctlDataObject[] $data
+     * @param BusctlDataObject|BusctlDataObject[]|null $data
      * @return string
      */
     public function marshal($data)
     {
+        if (is_null($data)) {
+            return null;
+        }
+        
         if ($data instanceof BusctlDataObject) {
             return $data->getValue(true);
         }

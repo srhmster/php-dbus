@@ -3,6 +3,7 @@
 namespace Srhmster\PhpDbus\DataObjects;
 
 use Exception;
+use Srhmster\PhpDbus\Marshallers\BusctlMarshaller;
 
 /**
  * Map busctl data object
@@ -12,11 +13,10 @@ class MapDataObject extends BusctlDataObject
     /**
      * Constructor
      *
-     * @param string $signature
      * @param BusctlDataObject[][] $value
      * @throws Exception
      */
-    public function __construct($signature, $value)
+    public function __construct($value)
     {
         if (!$this->isCorrectValues($value)) {
             throw new Exception('Incorrect data object signature inside array');
@@ -32,7 +32,8 @@ class MapDataObject extends BusctlDataObject
         $keySignature = $firstItem['key']->getSignature();
         $valueSignature = $firstItem['value']->getSignature();
         
-        $this->signature = $signature . '{' . $keySignature . $valueSignature . '}';
+        $this->signature = BusctlMarshaller::ARR . '{' . $keySignature
+            . $valueSignature . '}';
         $this->value = $value;
     }
     
@@ -41,10 +42,18 @@ class MapDataObject extends BusctlDataObject
      */
     public function getValue($withSignature = false)
     {
-        $value = count($this->value) . ' ';
-        foreach ($this->value as $item) {
-            $value .= $item['key']->getValue() . ' '
-                . $item['value']->getValue() . ' ';
+        if (count($this->value) === 1
+            && ($this->value[0]['value']->getValue() === null
+                || $this->value[0]['value']->getValue() === '0'
+            )
+        ) {
+            $value = '0';
+        } else {
+            $value = count($this->value) . ' ';
+            foreach ($this->value as $item) {
+                $value .= $item['key']->getValue() . ' '
+                    . $item['value']->getValue() . ' ';
+            }
         }
         
         return $withSignature === true

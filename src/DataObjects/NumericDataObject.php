@@ -11,9 +11,9 @@ class NumericDataObject extends BusctlDataObject
      * Constructor
      *
      * @param string $signature
-     * @param int|float $value
+     * @param int|float|null $value
      */
-    public function __construct($signature, $value)
+    public function __construct($signature, $value = null)
     {
         $this->signature = $signature;
         $this->value = $value;

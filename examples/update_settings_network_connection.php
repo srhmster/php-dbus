@@ -102,6 +102,15 @@ $dbus->call(
                         BusctlDataObject::s('manual')
                     )
                 ],
+                [
+                    'key' => BusctlDataObject::s('dns'),
+                    'value' => BusctlDataObject::v(
+                        // Empty DNS values
+                        BusctlDataObject::a([
+                            BusctlDataObject::u()
+                        ])
+                    )
+                ]
             ])
         ]
     ])

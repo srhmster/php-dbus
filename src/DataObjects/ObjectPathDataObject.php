@@ -12,9 +12,9 @@ class ObjectPathDataObject extends BusctlDataObject
     /**
      * Constructor
      *
-     * @param string $value
+     * @param string|null $value
      */
-    public function __construct($value)
+    public function __construct($value = null)
     {
         $this->signature = BusctlMarshaller::OBJECT_PATH;
         $this->value = $value;

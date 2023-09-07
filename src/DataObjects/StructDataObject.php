@@ -37,7 +37,13 @@ class StructDataObject extends BusctlDataObject
         } else {
             $value = '';
             foreach ($this->value as $dataObject) {
-                $value .= $dataObject->getValue() . ' ';
+                $value .= $dataObject->getValue() === null
+                    ? ''
+                    : $dataObject->getValue() . ' ';
+            }
+            
+            if ($value === '') {
+                $value = null;
             }
         }
         

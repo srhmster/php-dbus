@@ -12,9 +12,9 @@ class StringDataObject extends BusctlDataObject
     /**
      * Constructor
      *
-     * @param string $value
+     * @param string|null $value
      */
-    public function __construct($value)
+    public function __construct($value = null)
     {
         $this->signature = BusctlMarshaller::STRING;
         $this->value = $value;
@@ -25,8 +25,12 @@ class StringDataObject extends BusctlDataObject
      */
     public function getValue($withSignature = false)
     {
+        $value = $this->value === null
+            ? $this->value
+            : ('"' . $this->value . '"');
+        
         return $withSignature === true
-            ? $this->signature . ' "' . $this->value . '"'
-            : '"' . $this->value . '"';
+            ? $this->signature . ' ' . $value
+            : $value;
     }
 }

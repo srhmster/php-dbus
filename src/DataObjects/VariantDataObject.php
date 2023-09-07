@@ -31,8 +31,14 @@ class VariantDataObject extends BusctlDataObject
      */
     public function getValue($withSignature = false)
     {
+        if ($this->value->getValue() === null) {
+            $value = null;
+        } else {
+            $value = $this->value->getValue(true);
+        }
+        
         return $withSignature === true
-            ? $this->signature . ' ' . $this->value->getValue(true)
-            : $this->value->getValue(true);
+            ? $this->signature . ' ' . $value
+            : $value;
     }
 }

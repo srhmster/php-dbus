@@ -38,17 +38,17 @@ abstract class BusctlDataObject
      * Get data object value
      *
      * @param bool $withSignature
-     * @return mixed
+     * @return string|null
      */
     abstract public function getValue($withSignature = false);
     
     /**
      * Create string data object
      *
-     * @param string $value
+     * @param string|null $value
      * @return StringDataObject
      */
-    public static function s($value)
+    public static function s($value = null)
     {
         return new StringDataObject($value);
     }
@@ -56,10 +56,10 @@ abstract class BusctlDataObject
     /**
      * Create object path data object
      *
-     * @param string $value
+     * @param string|null $value
      * @return ObjectPathDataObject
      */
-    public static function o($value)
+    public static function o($value = null)
     {
         return new ObjectPathDataObject($value);
     }
@@ -67,10 +67,10 @@ abstract class BusctlDataObject
     /**
      * Create boolean data object
      *
-     * @param bool $value
+     * @param bool|null $value
      * @return BooleanDataObject
      */
-    public static function b($value)
+    public static function b($value = null)
     {
         return new BooleanDataObject($value);
     }
@@ -78,89 +78,89 @@ abstract class BusctlDataObject
     /**
      * Create byte data object
      *
-     * @param int $data
+     * @param int|null $value
      * @return NumericDataObject
      */
-    public static function y($data)
+    public static function y($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::BYTE, $data);
+        return new NumericDataObject(BusctlMarshaller::BYTE, $value);
     }
     
     /**
      * Create int16 data object
      *
-     * @param int $data
+     * @param int|null $value
      * @return NumericDataObject
      */
-    public static function n($data)
+    public static function n($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::INT16, $data);
+        return new NumericDataObject(BusctlMarshaller::INT16, $value);
     }
     
     /**
      * Create uint16 data object
      *
-     * @param int $data
+     * @param int|null $value
      * @return NumericDataObject
      */
-    public static function q($data)
+    public static function q($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::UINT16, $data);
+        return new NumericDataObject(BusctlMarshaller::UINT16, $value);
     }
     
     /**
      * Create int32 data object
      *
-     * @param int $data
+     * @param int|null $value
      * @return NumericDataObject
      */
-    public static function i($data)
+    public static function i($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::INT32, $data);
+        return new NumericDataObject(BusctlMarshaller::INT32, $value);
     }
     
     /**
      * Create uint32 data object
      *
-     * @param int $data
+     * @param int|null $value
      * @return NumericDataObject
      */
-    public static function u($data)
+    public static function u($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::UINT32, $data);
+        return new NumericDataObject(BusctlMarshaller::UINT32, $value);
     }
     
     /**
      * Create int64 data object
      *
-     * @param int $data
+     * @param int|null $value
      * @return NumericDataObject
      */
-    public static function x($data)
+    public static function x($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::INT64, $data);
+        return new NumericDataObject(BusctlMarshaller::INT64, $value);
     }
     
     /**
      * Create uint64 data object
      *
-     * @param int $data
+     * @param int|null $value
      * @return NumericDataObject
      */
-    public static function t($data)
+    public static function t($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::UINT64, $data);
+        return new NumericDataObject(BusctlMarshaller::UINT64, $value);
     }
     
     /**
      * Create double data object
      *
-     * @param float $data
+     * @param float|null $value
      * @return NumericDataObject
      */
-    public static function d($data)
+    public static function d($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::DOUBLE, $data);
+        return new NumericDataObject(BusctlMarshaller::DOUBLE, $value);
     }
     
     /**
@@ -195,7 +195,7 @@ abstract class BusctlDataObject
      */
     public static function a($value)
     {
-        return new ArrayDataObject(BusctlMarshaller::ARR, $value);
+        return new ArrayDataObject($value);
     }
     
     /**
@@ -207,6 +207,6 @@ abstract class BusctlDataObject
      */
     public static function e($value)
     {
-        return new MapDataObject(BusctlMarshaller::ARR, $value);
+        return new MapDataObject($value);
     }
 }

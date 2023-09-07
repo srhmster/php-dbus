@@ -12,9 +12,9 @@ class BooleanDataObject extends BusctlDataObject
     /**
      * Constructor
      *
-     * @param bool $value
+     * @param bool|null $value
      */
-    public function __construct($value)
+    public function __construct($value = null)
     {
         $this->signature = BusctlMarshaller::BOOL;
         $this->value = $value;
@@ -25,7 +25,11 @@ class BooleanDataObject extends BusctlDataObject
      */
     public function getValue($withSignature = false)
     {
-        $value = $this->value === true ? 'true' : 'false';
+        if ($this->value === null) {
+            $value = null;
+        } else {
+            $value = $this->value === true ? 'true' : 'false';
+        }
         
         return $withSignature === true
             ? $this->signature . ' ' . $value

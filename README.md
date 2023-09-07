@@ -115,91 +115,91 @@ object with the desired data type.
 
 ## Available methods
 
-### ::s($value)
+### ::s($value = null)
 Create string data object. `Base data type`
 
 Parameters:
-- `string` $value
+- `string|null` $value - Data object value, `null` by default
 
 Response: `StringDataObject`
 
-### ::o($value)
+### ::o($value = null)
 Create object path data object. `Base data type`
 
 Parameters:
-- `string` $value
+- `string|null` $value - Data object value, `null` by default
 
 Response: `ObjectPathDataObject`
 
-### ::b($value)
+### ::b($value = null)
 Create boolean data object. `Base data type`
 
 Parameters:
-- `bool` $value
+- `bool|null` $value - Data object value, `null` by default
 
 Response: `BooleanDataObject`
 
-### ::y($value)
+### ::y($value = null)
 Create byte data object. `Base data type`
 
 Parameters:
-- `int` $value
+- `int|null` $value - Data object value, `null` by default
 
 Response: `NumericDataObject`
 
-### ::n($value)
+### ::n($value = null)
 Create int16 data object. `Base data type`
 
 Parameters:
-- `int` $value
+- `int|null` $value - Data object value, `null` by default
 
 Response: `NumericDataObject`
 
-### ::q($value)
+### ::q($value = null)
 Create uint16 data object. `Base data type`
 
 Parameters:
-- `int` $value
+- `int|null` $value - Data object value, `null` by default
 
 Response: `NumericDataObject`
 
-### ::i($value)
+### ::i($value = null)
 Create int32 data object. `Base data type`
 
 Parameters:
-- `int` $value
+- `int|null` $value - Data object value, `null` by default
 
 Response: `NumericDataObject`
 
-### ::u($value)
+### ::u($value = null)
 Create uint32 data object. `Base data type`
 
 Parameters:
-- `int` $value
+- `int|null` $value - Data object value, `null` by default
 
 Response: `NumericDataObject`
 
-### ::x($value)
+### ::x($value = null)
 Create int64 data object. `Base data type`
 
 Parameters:
-- `int` $value
+- `int|null` $value - Data object value, `null` by default
 
 Response: `NumericDataObject`
 
-### ::t($value)
+### ::t($value = null)
 Create uint64 data object. `Base data type`
 
 Parameters:
-- `int` $value
+- `int|null` $value - Data object value, `null` by default
 
 Response: `NumericDataObject`
 
-### ::d($value)
+### ::d($value = null)
 Create double data object. `Base data type`
 
 Parameters:
-- `float` $value
+- `float|null` $value - Data object value, `null` by default
 
 Response: `NumericDataObject`
 

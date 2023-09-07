@@ -3,6 +3,7 @@
 namespace Srhmster\PhpDbus\DataObjects;
 
 use Exception;
+use Srhmster\PhpDbus\Marshallers\BusctlMarshaller;
 
 /**
  * Array busctl data object
@@ -12,17 +13,16 @@ class ArrayDataObject extends BusctlDataObject
     /**
      * Constructor
      *
-     * @param string $signature
      * @param BusctlDataObject[] $value
      * @throws Exception
      */
-    public function __construct($signature, $value)
+    public function __construct($value)
     {
         if (!$this->isCorrectValues($value)) {
             throw new Exception('Incorrect data object signature inside array');
         }
         
-        $this->signature = $signature . $value[0]->getSignature();
+        $this->signature = BusctlMarshaller::ARR . $value[0]->getSignature();
         $this->value = $value;
     }
     
@@ -31,9 +31,17 @@ class ArrayDataObject extends BusctlDataObject
      */
     public function getValue($withSignature = false)
     {
-        $value = count($this->value) . ' ';
-        foreach ($this->value as $dataObject) {
-            $value .= $dataObject->getValue() . ' ';
+        if (count($this->value) === 1
+            && ($this->value[0]->getValue() === null
+                || $this->value[0]->getValue() === '0'
+            )
+        ) {
+            $value = '0';
+        } else {
+            $value = count($this->value) . ' ';
+            foreach ($this->value as $dataObject) {
+                $value .= $dataObject->getValue() . ' ';
+            }
         }
         
         return $withSignature === true
