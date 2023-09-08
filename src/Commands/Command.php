@@ -18,6 +18,14 @@ interface Command
     public function setName($value);
     
     /**
+     * Set a flag to use sudo
+     *
+     * @param bool $value
+     * @return Command
+     */
+    public function setUseSudo($value);
+    
+    /**
      * Add option
      *
      * @param string $name

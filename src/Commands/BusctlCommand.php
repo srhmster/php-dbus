@@ -19,6 +19,13 @@ class BusctlCommand implements Command
     private $name;
     
     /**
+     * Sudo use flag
+     *
+     * @var bool
+     */
+    private $useSudo = false;
+    
+    /**
      * Command options
      *
      * @var array
@@ -31,6 +38,16 @@ class BusctlCommand implements Command
     public function setName($value)
     {
         $this->name = $value;
+        
+        return $this;
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public function setUseSudo($value)
+    {
+        $this->useSudo = $value;
         
         return $this;
     }
@@ -110,7 +127,8 @@ class BusctlCommand implements Command
      */
     private function toConsoleCommand($attributes)
     {
-        $command = self::PREFIX . ' ';
+        $command = $this->useSudo ? 'sudo ' : '';
+        $command .= self::PREFIX . ' ';
         foreach ($this->options as $option => $value) {
             $command .= "--$option";
             if (!is_null($value)) {

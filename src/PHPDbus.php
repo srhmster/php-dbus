@@ -64,6 +64,7 @@ class PHPDbus
      * @param string $interface
      * @param string $method
      * @param mixed|null $properties
+     * @param bool $useSudo
      * @param array $options
      * @return array|string|int|float|bool|null
      * @throws Exception
@@ -73,10 +74,12 @@ class PHPDbus
         $interface,
         $method,
         $properties = null,
+        $useSudo = false,
         $options = []
     ) {
         $response = $this->command
             ->setName(self::CALL)
+            ->setUseSudo($useSudo)
             ->addOptions($options)
             ->execute([
                 $this->service,
@@ -103,6 +106,7 @@ class PHPDbus
      * @param string $interface
      * @param string $signal
      * @param mixed|null $value
+     * @param bool $useSudo
      * @param array $options
      * @return void
      * @throws Exception
@@ -112,10 +116,12 @@ class PHPDbus
         $interface,
         $signal,
         $value = null,
+        $useSudo = false,
         $options = []
     ) {
         $this->command
             ->setName(self::EMIT)
+            ->setUseSudo($useSudo)
             ->addOptions($options)
             ->execute([
                 $this->service,
@@ -132,6 +138,7 @@ class PHPDbus
      * @param string $objectPath
      * @param string $interface
      * @param string $name
+     * @param bool $useSudo
      * @param array $options
      * @return array|string|int|float|bool|null
      * @throws Exception
@@ -140,10 +147,12 @@ class PHPDbus
         $objectPath,
         $interface,
         $name,
+        $useSudo = false,
         $options = []
     ) {
         $response = $this->command
             ->setName(self::GET_PROPERTY)
+            ->setUseSudo($useSudo)
             ->addOptions($options)
             ->execute([
                 $this->service,
@@ -169,6 +178,7 @@ class PHPDbus
      * @param string $interface
      * @param string $name
      * @param mixed|null $value
+     * @param bool $useSudo
      * @param array $options
      * @return void
      * @throws Exception
@@ -178,10 +188,12 @@ class PHPDbus
         $interface,
         $name,
         $value = null,
+        $useSudo = false,
         $options = []
     ) {
         $this->command
             ->setName(self::SET_PROPERTY)
+            ->setUseSudo($useSudo)
             ->addOptions($options)
             ->execute([
                 $this->service,

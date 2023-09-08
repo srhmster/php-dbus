@@ -6,8 +6,8 @@ PHP library for interact with DBus. By default, the console utility
 # Basic usage
 
 ### Composer
-This library is designed for use with the `composer` PHP dependency manager. Simply add the `srhmster/php-dbus` package 
-to get started:
+This library is designed for use with the `composer` PHP dependency manager. 
+Simply add the `srhmster/php-dbus` package to get started:
 
 ````
 composer require srhmster/php-dbus
@@ -43,7 +43,7 @@ Parameters:
   default
 - `Command|null $command` - Object of console command, `BusctlCommand` by default
 
-### call($objectPath, $interface, $method, $properties = null, $options = [])
+### call($objectPath, $interface, $method, $properties = null, $useSudo = false, $options = [])
 Invoke a method and show the response
 
 Parameters:
@@ -51,11 +51,12 @@ Parameters:
 - `string $interface` - Dbus interface name
 - `string $method` - Method name
 - `mixed|null $properties` - Properties value, `null` by default
+- `bool $useSudo` - Use sudo flag, `false` by default
 - `array $options` - Command options, empty array by default
 
 Response: `array|string|int|float|bool|null`
 
-### emit($objectPath, $interface, $signal, $value = null, $options = [])
+### emit($objectPath, $interface, $signal, $value = null, $useSudo = false, $options = [])
 Emit a signal
 
 Parameters:
@@ -63,22 +64,24 @@ Parameters:
 - `string $interface` - Dbus interface name
 - `string $signal` - Signal name
 - `mixed|null $value` - Signal value, `null` by default
+- `bool $useSudo` - Use sudo flag, `false` by default
 - `array $options` - Command options, empty array by default
 
 Response: `void`
 
-### getProperty($objectPath, $interface, $name, $options = [])
+### getProperty($objectPath, $interface, $name, $useSudo = false, $options = [])
 Retrieve the current value of object property
 
 Parameters:
 - `string $objectPath` - Dbus object path
 - `string $interface` - Dbus interface name
 - `string $name` - Property name
+- `bool $useSudo` - Use sudo flag, `false` by default
 - `array $options` - Command options, empty array by default
 
 Response: `array|string|int|float|bool|null`
 
-### setProperty($objectPath, $interface, $name, $value = null, $options = [])
+### setProperty($objectPath, $interface, $name, $value = null, $useSudo = false, $options = [])
 Set the current value of an object property
 
 Parameters:
@@ -86,6 +89,7 @@ Parameters:
 - `string $interface` - Dbus interface name
 - `string $name` - Property name
 - `mixed|null $value` - Property value, `null` by default
+- `bool $useSudo` - Use sudo flag, `false` by default
 - `array $options` - Command options, empty array by default
 
 Response: `void`
