@@ -2,27 +2,29 @@
 
 namespace Srhmster\PhpDbus\DataObjects;
 
-use Exception;
-use Srhmster\PhpDbus\Marshallers\BusctlMarshaller;
+use InvalidArgumentException;
 
 /**
  * Array busctl data object
  */
 class ArrayDataObject extends BusctlDataObject
 {
+    const SIGNATURE = 'a';
+    
     /**
      * Constructor
      *
      * @param BusctlDataObject[] $value
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function __construct($value)
     {
-        if (!$this->isCorrectValues($value)) {
-            throw new Exception('Incorrect data object signature inside array');
+        $errorMessage = '';
+        if (!$this->validate($value, $errorMessage)) {
+            throw new InvalidArgumentException($errorMessage);
         }
         
-        $this->signature = BusctlMarshaller::ARR . $value[0]->getSignature();
+        $this->signature = self::SIGNATURE . $value[0]->getSignature();
         $this->value = $value;
     }
     
@@ -50,17 +52,26 @@ class ArrayDataObject extends BusctlDataObject
     }
     
     /**
-     * Check signature for each element of data objects
+     * Check the correctness of the specified value
      *
-     * @param BusctlDataObject[] $dataObjects
+     * @param BusctlDataObject[] $value
+     * @param string $message
      * @return bool
      */
-    private function isCorrectValues($dataObjects)
+    private function validate($value, &$message)
     {
-        $signature = array_shift($dataObjects)->getSignature();
-        
-        foreach ($dataObjects as $dataObject) {
-            if ($dataObject->getSignature() !== $signature) {
+        if (count($value) === 0) {
+            $message = 'The value cannot be an empty array';
+            
+            return false;
+        }
+    
+        $signature = array_shift($value)->getSignature();
+        foreach ($value as $item) {
+            if ($item->getSignature() !== $signature) {
+                $message = 'The value cannot be an array of elements with '
+                    . 'different signatures';
+                
                 return false;
             }
         }

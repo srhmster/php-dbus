@@ -2,6 +2,8 @@
 
 namespace Srhmster\PhpDbus\DataObjects;
 
+use InvalidArgumentException;
+
 /**
  * Struct busctl data object
  */
@@ -11,9 +13,16 @@ class StructDataObject extends BusctlDataObject
      * Constructor
      *
      * @param BusctlDataObject|BusctlDataObject[] $value
+     * @throws InvalidArgumentException
      */
     public function __construct($value)
     {
+        if (!$this->validate($value)) {
+            throw new InvalidArgumentException(
+                'The value cannot be an empty array'
+            );
+        }
+        
         if ($value instanceof BusctlDataObject) {
             $signature = $value->getSignature();
         } else {
@@ -50,5 +59,20 @@ class StructDataObject extends BusctlDataObject
         return $withSignature === true
             ? $this->signature . ' ' . $value
             : $value;
+    }
+    
+    /**
+     * Check the correctness of the specified value
+     *
+     * @param BusctlDataObject|BusctlDataObject[] $value
+     * @return bool
+     */
+    private function validate($value)
+    {
+        if (is_array($value) && count($value) === 0) {
+            return false;
+        }
+        
+        return true;
     }
 }

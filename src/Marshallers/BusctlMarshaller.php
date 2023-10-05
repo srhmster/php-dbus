@@ -2,28 +2,19 @@
 
 namespace Srhmster\PhpDbus\Marshallers;
 
+use Srhmster\PhpDbus\DataObjects\ArrayDataObject;
+use Srhmster\PhpDbus\DataObjects\BooleanDataObject;
 use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
+use Srhmster\PhpDbus\DataObjects\NumericDataObject;
+use Srhmster\PhpDbus\DataObjects\ObjectPathDataObject;
+use Srhmster\PhpDbus\DataObjects\StringDataObject;
+use Srhmster\PhpDbus\DataObjects\VariantDataObject;
 
 /**
  * Busctl data converter
  */
 class BusctlMarshaller implements Marshaller
 {
-    // Data types in the signature
-    const STRING = 's';
-    const OBJECT_PATH = 'o';
-    const BYTE = 'y';
-    const INT16 = 'n';
-    const UINT16 = 'q';
-    const INT32 = 'i';
-    const UINT32 = 'u';
-    const INT64 = 'x';
-    const UINT64 = 't';
-    const DOUBLE = 'd';
-    const BOOL = 'b';
-    const VARIANT = 'v';
-    const ARR = 'a';
-    
     /**
      * Convert PHP data to Dbus format
      *
@@ -60,24 +51,24 @@ class BusctlMarshaller implements Marshaller
             $response = null;
         
             switch ($signature) {
-                case self::STRING:
-                case self::OBJECT_PATH:
+                case StringDataObject::SIGNATURE:
+                case ObjectPathDataObject::SIGNATURE:
                     $response = str_replace('"', '', array_shift($data));
                     break;
-                case self::BYTE:
-                case self::INT16:
-                case self::UINT16:
-                case self::INT32:
-                case self::UINT32:
-                case self::INT64:
-                case self::UINT64:
-                case self::DOUBLE:
+                case NumericDataObject::BYTE_SIGNATURE:
+                case NumericDataObject::INT16_SIGNATURE:
+                case NumericDataObject::UINT16_SIGNATURE:
+                case NumericDataObject::INT32_SIGNATURE:
+                case NumericDataObject::UINT32_SIGNATURE:
+                case NumericDataObject::INT64_SIGNATURE:
+                case NumericDataObject::UINT64_SIGNATURE:
+                case NumericDataObject::DOUBLE_SIGNATURE:
                     $response = array_shift($data) * 1;
                     break;
-                case self::BOOL:
+                case BooleanDataObject::SIGNATURE:
                     $response = array_shift($data) === 'true';
                     break;
-                case self::VARIANT:
+                case VariantDataObject::SIGNATURE:
                     $response = $this->unmarshal(array_shift($data), $data);
                     break;
             }
@@ -113,7 +104,7 @@ class BusctlMarshaller implements Marshaller
                     $position = $pEnd;
                 
                     break;
-                case self::ARR:
+                case ArrayDataObject::SIGNATURE:
                     // Find the type of array elements
                     $stPosition = $this
                         ->findArraySubtypePosition($signature, $position);
@@ -188,7 +179,7 @@ class BusctlMarshaller implements Marshaller
                 $position['end'] = strripos($signature, '}') - 1;
                 
                 break;
-            case self::ARR:
+            case ArrayDataObject::SIGNATURE:
                 $position['start'] = $pStart + 1;
                 $position['end'] = $this->findArraySubtypePosition(
                         $signature,

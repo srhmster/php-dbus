@@ -2,8 +2,7 @@
 
 namespace Srhmster\PhpDbus\DataObjects;
 
-use Exception;
-use Srhmster\PhpDbus\Marshallers\BusctlMarshaller;
+use InvalidArgumentException;
 
 /**
  * Busctl data object
@@ -47,6 +46,7 @@ abstract class BusctlDataObject
      *
      * @param string|null $value
      * @return StringDataObject
+     * @throws InvalidArgumentException
      */
     public static function s($value = null)
     {
@@ -58,6 +58,7 @@ abstract class BusctlDataObject
      *
      * @param string|null $value
      * @return ObjectPathDataObject
+     * @throws InvalidArgumentException
      */
     public static function o($value = null)
     {
@@ -69,6 +70,7 @@ abstract class BusctlDataObject
      *
      * @param bool|null $value
      * @return BooleanDataObject
+     * @throws InvalidArgumentException
      */
     public static function b($value = null)
     {
@@ -80,10 +82,11 @@ abstract class BusctlDataObject
      *
      * @param int|null $value
      * @return NumericDataObject
+     * @throws InvalidArgumentException
      */
     public static function y($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::BYTE, $value);
+        return new NumericDataObject(NumericDataObject::BYTE_SIGNATURE, $value);
     }
     
     /**
@@ -91,10 +94,11 @@ abstract class BusctlDataObject
      *
      * @param int|null $value
      * @return NumericDataObject
+     * @throws InvalidArgumentException
      */
     public static function n($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::INT16, $value);
+        return new NumericDataObject(NumericDataObject::INT16_SIGNATURE, $value);
     }
     
     /**
@@ -102,10 +106,11 @@ abstract class BusctlDataObject
      *
      * @param int|null $value
      * @return NumericDataObject
+     * @throws InvalidArgumentException
      */
     public static function q($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::UINT16, $value);
+        return new NumericDataObject(NumericDataObject::UINT16_SIGNATURE, $value);
     }
     
     /**
@@ -113,10 +118,11 @@ abstract class BusctlDataObject
      *
      * @param int|null $value
      * @return NumericDataObject
+     * @throws InvalidArgumentException
      */
     public static function i($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::INT32, $value);
+        return new NumericDataObject(NumericDataObject::INT32_SIGNATURE, $value);
     }
     
     /**
@@ -124,10 +130,11 @@ abstract class BusctlDataObject
      *
      * @param int|null $value
      * @return NumericDataObject
+     * @throws InvalidArgumentException
      */
     public static function u($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::UINT32, $value);
+        return new NumericDataObject(NumericDataObject::UINT32_SIGNATURE, $value);
     }
     
     /**
@@ -135,10 +142,11 @@ abstract class BusctlDataObject
      *
      * @param int|null $value
      * @return NumericDataObject
+     * @throws InvalidArgumentException
      */
     public static function x($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::INT64, $value);
+        return new NumericDataObject(NumericDataObject::INT64_SIGNATURE, $value);
     }
     
     /**
@@ -146,10 +154,11 @@ abstract class BusctlDataObject
      *
      * @param int|null $value
      * @return NumericDataObject
+     * @throws InvalidArgumentException
      */
     public static function t($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::UINT64, $value);
+        return new NumericDataObject(NumericDataObject::UINT64_SIGNATURE, $value);
     }
     
     /**
@@ -157,10 +166,11 @@ abstract class BusctlDataObject
      *
      * @param float|null $value
      * @return NumericDataObject
+     * @throws InvalidArgumentException
      */
     public static function d($value = null)
     {
-        return new NumericDataObject(BusctlMarshaller::DOUBLE, $value);
+        return new NumericDataObject(NumericDataObject::DOUBLE_SIGNATURE, $value);
     }
     
     /**
@@ -168,7 +178,6 @@ abstract class BusctlDataObject
      *
      * @param BusctlDataObject $value
      * @return VariantDataObject
-     * @throws Exception
      */
     public static function v(BusctlDataObject $value)
     {
@@ -180,6 +189,7 @@ abstract class BusctlDataObject
      *
      * @param BusctlDataObject|BusctlDataObject[] $value
      * @return StructDataObject
+     * @throws InvalidArgumentException
      */
     public static function r($value)
     {
@@ -191,7 +201,7 @@ abstract class BusctlDataObject
      *
      * @param BusctlDataObject[] $value
      * @return ArrayDataObject
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public static function a($value)
     {
@@ -203,7 +213,7 @@ abstract class BusctlDataObject
      *
      * @param BusctlDataObject[][] $value
      * @return MapDataObject
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public static function e($value)
     {

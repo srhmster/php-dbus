@@ -2,8 +2,7 @@
 
 namespace Srhmster\PhpDbus\DataObjects;
 
-use Exception;
-use Srhmster\PhpDbus\Marshallers\BusctlMarshaller;
+use InvalidArgumentException;
 
 /**
  * Map busctl data object
@@ -14,25 +13,19 @@ class MapDataObject extends BusctlDataObject
      * Constructor
      *
      * @param BusctlDataObject[][] $value
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function __construct($value)
     {
-        if (!$this->isCorrectValues($value)) {
-            throw new Exception('Incorrect data object signature inside array');
+        $errorMessage = '';
+        if (!$this->validate($value, $errorMessage)) {
+            throw new InvalidArgumentException($errorMessage);
         }
         
-        $firstItem = $value[0];
-        if (!$this->isBasicType($firstItem['key'])) {
-            throw new Exception(
-                'Incorrect key value. The key must be a base data type.'
-            );
-        }
+        $keySignature = $value[0]['key']->getSignature();
+        $valueSignature = $value[0]['value']->getSignature();
         
-        $keySignature = $firstItem['key']->getSignature();
-        $valueSignature = $firstItem['value']->getSignature();
-        
-        $this->signature = BusctlMarshaller::ARR . '{' . $keySignature
+        $this->signature = ArrayDataObject::SIGNATURE . '{' . $keySignature
             . $valueSignature . '}';
         $this->value = $value;
     }
@@ -81,21 +74,58 @@ class MapDataObject extends BusctlDataObject
     }
     
     /**
-     * Check signature for each element of data objects
+     * Check the correctness of the specified item structure and value
      *
-     * @param BusctlDataObject[][] $dataObjects
+     * @param BusctlDataObject[] $item
      * @return bool
      */
-    private function isCorrectValues($dataObjects)
+    private function validateItem($item)
     {
-        $firstItem = array_shift($dataObjects);
+        return isset($item['key'])
+            && isset($item['value'])
+            && $this->isBasicType($item['key'])
+            && $this->isBasicType($item['value']);
+    }
+    
+    /**
+     * Check the correctness of the specified value
+     *
+     * @param BusctlDataObject[][] $value
+     * @param string $message
+     * @return bool
+     */
+    private function validate($value, &$message)
+    {
+        if (count($value) === 0) {
+            $message = 'The value cannot be an empty array';
+            
+            return false;
+        }
+        
+        $firstItem = array_shift($value);
+        if (!$this->validateItem($firstItem)) {
+            $message = 'Each element must contain a "key" and a "value" element,'
+                . ' which are BusctlDataObject::class objects of basic data types';
+            
+            return false;
+        }
+        
         $keySignature = $firstItem['key']->getSignature();
         $valueSignature = $firstItem['value']->getSignature();
-        
-        foreach ($dataObjects as $dataObject) {
-            if ($dataObject['key']->getSignature() !== $keySignature
-                || $dataObject['value']->getSignature() !== $valueSignature
+        foreach ($value as $item) {
+            if (!$this->validateItem($item)) {
+                $message = 'Each element must contain a "key" and a "value" element,'
+                    . ' which are BusctlDataObject::class objects of basic data types';
+                
+                return false;
+            }
+            
+            if ($item['key']->getSignature() !== $keySignature
+                || $item['value']->getSignature() !== $valueSignature
             ) {
+                $message = 'Each element must have the same data types for the '
+                    . '"key" and "value" elements';
+                
                 return false;
             }
         }
