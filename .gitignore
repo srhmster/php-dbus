@@ -1,2 +1,7 @@
 # JetBrains project files
 .idea/*
+
+# Composer files
+vendor/
+composer.phar
+composer.lock

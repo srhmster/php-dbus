@@ -32,6 +32,9 @@ require_once __DIR__ . '/vendor/srhmster/php-dbus/autoload.php';
 Files with examples of using the library can be found in the `examples` 
 directory
 
+# Tests
+Use command `./vendor/bin/phpunit tests` for run PHPUnit tests
+
 # Available methods
 
 ### __construct($service, Marshaller $marshaller = null, Command $command = null)
