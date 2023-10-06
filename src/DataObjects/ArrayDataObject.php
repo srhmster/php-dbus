@@ -40,9 +40,9 @@ class ArrayDataObject extends BusctlDataObject
         ) {
             $value = '0';
         } else {
-            $value = count($this->value) . ' ';
+            $value = count($this->value);
             foreach ($this->value as $dataObject) {
-                $value .= $dataObject->getValue() . ' ';
+                $value .= ' ' . $dataObject->getValue();
             }
         }
         
@@ -60,19 +60,37 @@ class ArrayDataObject extends BusctlDataObject
      */
     private function validate($value, &$message)
     {
+        if (!is_array($value)) {
+            $message = 'A array value was expected, but a ' . gettype($value)
+                . ' was passed';
+            
+            return false;
+        }
+        
         if (count($value) === 0) {
             $message = 'The value cannot be an empty array';
             
             return false;
         }
     
-        $signature = array_shift($value)->getSignature();
+        $signature = null;
         foreach ($value as $item) {
-            if ($item->getSignature() !== $signature) {
-                $message = 'The value cannot be an array of elements with '
-                    . 'different signatures';
+            if (!($item instanceof BusctlDataObject)) {
+                $message = 'A BusctlDataObject::class value item was expected, '
+                    . 'but a ' . gettype($item) . ' was passed';
                 
                 return false;
+            }
+            
+            if (is_null($signature)) {
+                $signature = $item->getSignature();
+            } else {
+                if ($item->getSignature() !== $signature) {
+                    $message = 'The value cannot be an array of elements with '
+                        . 'different signatures';
+        
+                    return false;
+                }
             }
         }
         

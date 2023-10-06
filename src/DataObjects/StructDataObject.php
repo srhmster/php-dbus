@@ -17,10 +17,9 @@ class StructDataObject extends BusctlDataObject
      */
     public function __construct($value)
     {
-        if (!$this->validate($value)) {
-            throw new InvalidArgumentException(
-                'The value cannot be an empty array'
-            );
+        $errorMessage = '';
+        if (!$this->validate($value, $errorMessage)) {
+            throw new InvalidArgumentException($errorMessage);
         }
         
         if ($value instanceof BusctlDataObject) {
@@ -50,6 +49,7 @@ class StructDataObject extends BusctlDataObject
                     ? ''
                     : $dataObject->getValue() . ' ';
             }
+            $value = trim($value);
             
             if ($value === '') {
                 $value = null;
@@ -65,12 +65,33 @@ class StructDataObject extends BusctlDataObject
      * Check the correctness of the specified value
      *
      * @param BusctlDataObject|BusctlDataObject[] $value
+     * @param string $message
      * @return bool
      */
-    private function validate($value)
+    private function validate($value, &$message)
     {
-        if (is_array($value) && count($value) === 0) {
-            return false;
+        if (is_array($value)) {
+            if (count($value) === 0) {
+                $message = 'The value cannot be an empty array';
+                
+                return false;
+            }
+            
+            foreach ($value as $item) {
+                if (!($item instanceof BusctlDataObject)) {
+                    $message = 'A BusctlDataObject::class value item was expected, '
+                        . 'but a ' . gettype($item) . ' was passed';
+                    
+                    return false;
+                }
+            }
+        } else {
+            if (!($value instanceof BusctlDataObject)) {
+                $message = 'A BusctlDataObject::class value was expected, but a '
+                    . gettype($value) . ' was passed';
+                
+                return false;
+            }
         }
         
         return true;

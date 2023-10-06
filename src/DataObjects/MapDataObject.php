@@ -42,10 +42,10 @@ class MapDataObject extends BusctlDataObject
         ) {
             $value = '0';
         } else {
-            $value = count($this->value) . ' ';
+            $value = count($this->value);
             foreach ($this->value as $item) {
-                $value .= $item['key']->getValue() . ' '
-                    . $item['value']->getValue() . ' ';
+                $value .= ' ' . $item['key']->getValue() . ' '
+                    . $item['value']->getValue();
             }
         }
         
@@ -81,10 +81,11 @@ class MapDataObject extends BusctlDataObject
      */
     private function validateItem($item)
     {
-        return isset($item['key'])
+        return is_array($item)
+            && isset($item['key'])
             && isset($item['value'])
-            && $this->isBasicType($item['key'])
-            && $this->isBasicType($item['value']);
+            && $item['key'] instanceof BusctlDataObject
+            && $item['value'] instanceof BusctlDataObject;
     }
     
     /**
@@ -96,37 +97,47 @@ class MapDataObject extends BusctlDataObject
      */
     private function validate($value, &$message)
     {
+        if (!is_array($value)) {
+            $message = 'A array value was expected, but a ' . gettype($value)
+                . ' was passed';
+            
+            return false;
+        }
+        
         if (count($value) === 0) {
             $message = 'The value cannot be an empty array';
             
             return false;
         }
         
-        $firstItem = array_shift($value);
-        if (!$this->validateItem($firstItem)) {
-            $message = 'Each element must contain a "key" and a "value" element,'
-                . ' which are BusctlDataObject::class objects of basic data types';
-            
-            return false;
-        }
-        
-        $keySignature = $firstItem['key']->getSignature();
-        $valueSignature = $firstItem['value']->getSignature();
+        $keySignature = null;
+        $valueSignature = null;
         foreach ($value as $item) {
             if (!$this->validateItem($item)) {
                 $message = 'Each element must contain a "key" and a "value" element,'
-                    . ' which are BusctlDataObject::class objects of basic data types';
+                    . ' which are BusctlDataObject::class objects';
                 
                 return false;
             }
-            
-            if ($item['key']->getSignature() !== $keySignature
-                || $item['value']->getSignature() !== $valueSignature
-            ) {
-                $message = 'Each element must have the same data types for the '
-                    . '"key" and "value" elements';
-                
+    
+            if (!$this->isBasicType($item['key'])) {
+                $message = 'The key cannot be a container type data object';
+        
                 return false;
+            }
+            
+            if (is_null($keySignature) && is_null($valueSignature)) {
+                $keySignature = $item['key']->getSignature();
+                $valueSignature = $item['value']->getSignature();
+            } else {
+                if ($item['key']->getSignature() !== $keySignature
+                    || $item['value']->getSignature() !== $valueSignature
+                ) {
+                    $message = 'Each element must have the same data types for the '
+                        . '"key" and "value" elements';
+        
+                    return false;
+                }
             }
         }
         
