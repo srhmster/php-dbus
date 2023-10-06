@@ -50,4 +50,12 @@ interface Command
      * @throws Exception
      */
     public function execute($attributes);
+    
+    /**
+     * Convert command object to string with console command
+     *
+     * @param array $attributes
+     * @return string
+     */
+    public function toString($attributes);
 }

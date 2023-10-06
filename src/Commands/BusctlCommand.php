@@ -100,11 +100,10 @@ class BusctlCommand implements Command
      */
     public function execute($attributes)
     {
-        $command = $this->toConsoleCommand($attributes) . ' 2>&1';
         $response = null;
         $code = null;
     
-        exec($command, $response, $code);
+        exec($this->toString($attributes) . ' 2>&1', $response, $code);
         if ($code !== 0) {
             throw new Exception($response[0], $code);
         }
@@ -121,11 +120,9 @@ class BusctlCommand implements Command
     }
     
     /**
-     * Convert command object to console string
-     *
-     * @return string
+     * @inheritdoc
      */
-    private function toConsoleCommand($attributes)
+    public function toString($attributes)
     {
         $command = $this->useSudo ? 'sudo ' : '';
         $command .= self::PREFIX . ' ';
