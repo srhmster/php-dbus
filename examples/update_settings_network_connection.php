@@ -71,7 +71,7 @@ $dbus->call(
                 [
                     'key' => BusctlDataObject::s('address-data'),
                     'value' => BusctlDataObject::v(
-                    // Data format is aa{sv}
+                        // Data format is aa{sv}
                         BusctlDataObject::a([
                             BusctlDataObject::e([
                                 [
