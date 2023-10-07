@@ -2,7 +2,9 @@
 
 namespace Srhmster\PhpDbus;
 
-use Exception;
+use BadMethodCallException;
+use InvalidArgumentException;
+use RuntimeException;
 use Srhmster\PhpDbus\Commands\BusctlCommand;
 use Srhmster\PhpDbus\Commands\Command;
 use Srhmster\PhpDbus\Marshallers\BusctlMarshaller;
@@ -39,24 +41,32 @@ class PHPDbus
      * @var Command
      */
     private $command;
-    
+
     /**
      * Constructor
      *
      * @param string $service
      * @param Marshaller|null $marshaller Object of data converter
      * @param Command|null $command Object of console command
+     * @throws InvalidArgumentException
      */
     public function __construct(
         $service,
         Marshaller $marshaller = null,
         Command $command = null
     ) {
+        if (!is_string($service)) {
+            throw new InvalidArgumentException(
+                'A string service was expected, but a ' . gettype($service)
+                . ' was passed'
+            );
+        }
+
         $this->service = $service;
         $this->marshaller = $marshaller ?: new BusctlMarshaller();
         $this->command = $command ?: new BusctlCommand();
     }
-    
+
     /**
      * Invoke a method and show the response
      *
@@ -67,7 +77,7 @@ class PHPDbus
      * @param bool $useSudo
      * @param array $options
      * @return array|string|int|float|bool|null
-     * @throws Exception
+     * @throws InvalidArgumentException|BadMethodCallException|RuntimeException
      */
     public function call(
         $objectPath,
@@ -77,8 +87,16 @@ class PHPDbus
         $useSudo = false,
         $options = []
     ) {
+        $errorMessage = '';
+        if (!$this->validateString($objectPath, 'object path', $errorMessage)
+            || !$this->validateString($interface, 'interface', $errorMessage)
+            || !$this->validateString($method, 'method', $errorMessage)
+        ) {
+            throw new InvalidArgumentException($errorMessage);
+        }
+
         $response = $this->command
-            ->setName(self::CALL)
+            ->setMethod(self::CALL)
             ->setUseSudo($useSudo)
             ->addOptions($options)
             ->execute([
@@ -92,13 +110,13 @@ class PHPDbus
         if (!is_null($response)) {
             $data = explode(' ', $response);
             $signature = array_shift($data);
-            
+
             return $this->marshaller->unmarshal($signature, $data);
         }
-        
+
         return null;
     }
-    
+
     /**
      * Emit a signal
      *
@@ -109,7 +127,7 @@ class PHPDbus
      * @param bool $useSudo
      * @param array $options
      * @return void
-     * @throws Exception
+     * @throws InvalidArgumentException|BadMethodCallException|RuntimeException
      */
     public function emit(
         $objectPath,
@@ -119,8 +137,16 @@ class PHPDbus
         $useSudo = false,
         $options = []
     ) {
+        $errorMessage = '';
+        if (!$this->validateString($objectPath, 'object path', $errorMessage)
+            || !$this->validateString($interface, 'interface', $errorMessage)
+            || !$this->validateString($signal, 'signal', $errorMessage)
+        ) {
+            throw new InvalidArgumentException($errorMessage);
+        }
+
         $this->command
-            ->setName(self::EMIT)
+            ->setMethod(self::EMIT)
             ->setUseSudo($useSudo)
             ->addOptions($options)
             ->execute([
@@ -131,7 +157,7 @@ class PHPDbus
                 $this->marshaller->marshal($value)
             ]);
     }
-    
+
     /**
      * Retrieve the current value of object property
      *
@@ -141,7 +167,7 @@ class PHPDbus
      * @param bool $useSudo
      * @param array $options
      * @return array|string|int|float|bool|null
-     * @throws Exception
+     * @throws InvalidArgumentException|BadMethodCallException|RuntimeException
      */
     public function getProperty(
         $objectPath,
@@ -150,8 +176,16 @@ class PHPDbus
         $useSudo = false,
         $options = []
     ) {
+        $errorMessage = '';
+        if (!$this->validateString($objectPath, 'object path', $errorMessage)
+            || !$this->validateString($interface, 'interface', $errorMessage)
+            || !$this->validateString($name, 'name', $errorMessage)
+        ) {
+            throw new InvalidArgumentException($errorMessage);
+        }
+
         $response = $this->command
-            ->setName(self::GET_PROPERTY)
+            ->setMethod(self::GET_PROPERTY)
             ->setUseSudo($useSudo)
             ->addOptions($options)
             ->execute([
@@ -181,7 +215,7 @@ class PHPDbus
      * @param bool $useSudo
      * @param array $options
      * @return void
-     * @throws Exception
+     * @throws InvalidArgumentException|BadMethodCallException|RuntimeException
      */
     public function setProperty(
         $objectPath,
@@ -191,8 +225,16 @@ class PHPDbus
         $useSudo = false,
         $options = []
     ) {
+        $errorMessage = '';
+        if (!$this->validateString($objectPath, 'object path', $errorMessage)
+            || !$this->validateString($interface, 'interface', $errorMessage)
+            || !$this->validateString($name, 'name', $errorMessage)
+        ) {
+            throw new InvalidArgumentException($errorMessage);
+        }
+
         $this->command
-            ->setName(self::SET_PROPERTY)
+            ->setMethod(self::SET_PROPERTY)
             ->setUseSudo($useSudo)
             ->addOptions($options)
             ->execute([
@@ -202,5 +244,25 @@ class PHPDbus
                 $name,
                 $this->marshaller->marshal($value)
             ]);
+    }
+
+    /**
+     * Validate string
+     *
+     * @param mixed $value
+     * @param string $name
+     * @param string $message
+     * @return bool
+     */
+    private function validateString($value, $name, &$message)
+    {
+        if (!is_string($value)) {
+            $message = "A string $name was expected, but a " . gettype($value)
+                . ' was passed';
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -2,7 +2,9 @@
 
 namespace Srhmster\PhpDbus\Commands;
 
-use Exception;
+use BadMethodCallException;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Busctl console command
@@ -12,11 +14,11 @@ class BusctlCommand implements Command
     const PREFIX = 'busctl';
     
     /**
-     * Command name
+     * Command method
      *
      * @var string
      */
-    private $name;
+    private $method;
     
     /**
      * Sudo use flag
@@ -31,22 +33,36 @@ class BusctlCommand implements Command
      * @var array
      */
     private $options = [];
-    
+
     /**
      * @inheritdoc
      */
-    public function setName($value)
+    public function setMethod($value)
     {
-        $this->name = $value;
-        
+        if (!is_string($value)) {
+            throw new InvalidArgumentException(
+                'A string method was expected, but a ' . gettype($value)
+                . ' was passed'
+            );
+        }
+
+        $this->method = $value;
+
         return $this;
     }
-    
+
     /**
      * @inheritdoc
      */
     public function setUseSudo($value)
     {
+        if (!is_bool($value)) {
+            throw new InvalidArgumentException(
+                'A boolean use sudo flag was expected, but a ' . gettype($value)
+                . ' was passed'
+            );
+        }
+
         $this->useSudo = $value;
         
         return $this;
@@ -57,6 +73,13 @@ class BusctlCommand implements Command
      */
     public function addOption($name, $value = null)
     {
+        if (!is_string($name)) {
+            throw new InvalidArgumentException(
+                'A string option name was expected, but a ' . gettype($name)
+                . ' was passed'
+            );
+        }
+
         $this->options[$name] = $value;
         
         return $this;
@@ -81,9 +104,17 @@ class BusctlCommand implements Command
      *
      * @param array $options
      * @return Command
+     * @throws InvalidArgumentException
      */
     public function addOptions($options)
     {
+        if (!is_array($options)) {
+            throw new InvalidArgumentException(
+                'A array options was expected, but a ' . gettype($options)
+                . ' was passed'
+            );
+        }
+
         foreach ($options as $option) {
             if (is_array($option) && isset($option[0]) && isset($option[1])) {
                 $this->addOption($option[0], $option[1]);
@@ -98,14 +129,21 @@ class BusctlCommand implements Command
     /**
      * @inheritdoc
      */
-    public function execute($attributes)
+    public function execute($attributes = [])
     {
+        if (!is_array($attributes)) {
+            throw new InvalidArgumentException(
+                'A array value was expected, but a ' . gettype($attributes)
+                . ' was passed'
+            );
+        }
+
         $response = null;
         $code = null;
     
         exec($this->toString($attributes) . ' 2>&1', $response, $code);
         if ($code !== 0) {
-            throw new Exception($response[0], $code);
+            throw new RuntimeException($response[0], $code);
         }
     
         if (isset($response) && count($response) > 0) {
@@ -122,18 +160,25 @@ class BusctlCommand implements Command
     /**
      * @inheritdoc
      */
-    public function toString($attributes)
+    public function toString($attributes = [])
     {
+        if (!isset($this->method)) {
+            throw new BadMethodCallException("Method command not specified");
+        }
+
         $command = $this->useSudo ? 'sudo ' : '';
-        $command .= self::PREFIX . ' ';
+        $command .= self::PREFIX;
         foreach ($this->options as $option => $value) {
-            $command .= "--$option";
+            $command .= " --$option";
             if (!is_null($value)) {
                 $command .= "=$value";
             }
-            $command .= " ";
         }
-    
-        return "$command $this->name " . implode(' ', $attributes);
+
+        $command .= ' ' . $this->method;
+
+        return count($attributes) === 0
+            ? $command
+            : $command . ' ' . implode(' ', $attributes);
     }
 }

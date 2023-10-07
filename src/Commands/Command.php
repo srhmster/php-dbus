@@ -2,7 +2,9 @@
 
 namespace Srhmster\PhpDbus\Commands;
 
-use Exception;
+use BadMethodCallException;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Console command interface
@@ -10,18 +12,20 @@ use Exception;
 interface Command
 {
     /**
-     * Set command name
+     * Set command method
      *
      * @param string $value
      * @return Command
+     * @throws InvalidArgumentException
      */
-    public function setName($value);
-    
+    public function setMethod($value);
+
     /**
      * Set a flag to use sudo
      *
      * @param bool $value
      * @return Command
+     * @throws InvalidArgumentException
      */
     public function setUseSudo($value);
     
@@ -31,6 +35,7 @@ interface Command
      * @param string $name
      * @param string|int|bool|null $value
      * @return Command
+     * @throws InvalidArgumentException
      */
     public function addOption($name, $value = null);
     
@@ -39,6 +44,7 @@ interface Command
      *
      * @param array $options
      * @return Command
+     * @throws InvalidArgumentException
      */
     public function addOptions($options);
     
@@ -47,15 +53,16 @@ interface Command
      *
      * @param array $attributes
      * @return string|array|null
-     * @throws Exception
+     * @throws InvalidArgumentException|BadMethodCallException|RuntimeException
      */
-    public function execute($attributes);
+    public function execute($attributes = []);
     
     /**
      * Convert command object to string with console command
      *
      * @param array $attributes
      * @return string
+     * @throws BadMethodCallException
      */
-    public function toString($attributes);
+    public function toString($attributes = []);
 }
