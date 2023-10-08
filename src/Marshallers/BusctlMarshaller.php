@@ -2,6 +2,7 @@
 
 namespace Srhmster\PhpDbus\Marshallers;
 
+use InvalidArgumentException;
 use Srhmster\PhpDbus\DataObjects\ArrayDataObject;
 use Srhmster\PhpDbus\DataObjects\BooleanDataObject;
 use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
@@ -20,9 +21,20 @@ class BusctlMarshaller implements Marshaller
      *
      * @param BusctlDataObject|BusctlDataObject[]|null $data
      * @return string
+     * @throws InvalidArgumentException
      */
     public function marshal($data)
     {
+        if (!is_null($data)
+            && !($data instanceof BusctlDataObject)
+            && !is_array($data)
+        ) {
+            throw new InvalidArgumentException(
+                'A BusctlDataObject::class, array or null data was expected, '
+                . 'but a ' . gettype($data) . ' was passed'
+            );
+        }
+
         if (is_null($data)) {
             return null;
         }
@@ -30,15 +42,28 @@ class BusctlMarshaller implements Marshaller
         if ($data instanceof BusctlDataObject) {
             return $data->getValue(true);
         }
-        
+
+        if (count($data) === 0) {
+            throw new InvalidArgumentException(
+                'The data cannot be an empty array'
+            );
+        }
+
         $signature = '';
         $value = '';
         foreach ($data as $dataObject) {
+            if (! $dataObject instanceof BusctlDataObject) {
+                throw new InvalidArgumentException(
+                    'A BusctlDataObject::class data item was expected, but a '
+                    . gettype($dataObject) . ' was passed'
+                );
+            }
+
             $signature .= $dataObject->getSignature();
-            $value .= $dataObject->getValue() . ' ';
+            $value .= ' ' . $dataObject->getValue();
         }
         
-        return $signature . ' ' . $value;
+        return $signature . $value;
     }
     
     /**
@@ -46,6 +71,20 @@ class BusctlMarshaller implements Marshaller
      */
     public function unmarshal($signature, &$data)
     {
+        if (!is_string($signature)) {
+            throw new InvalidArgumentException(
+                'A string signature was expected, but a ' . gettype($signature)
+                . ' was passed'
+            );
+        }
+
+        if (!is_array($data)) {
+            throw new InvalidArgumentException(
+                'A array data was expected, but a ' . gettype($data)
+                . ' was passed'
+            );
+        }
+
         // Unmarshal base types
         if (strlen($signature) === 1) {
             $response = null;

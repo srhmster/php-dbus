@@ -2,6 +2,8 @@
 
 namespace Srhmster\PhpDbus\Marshallers;
 
+use InvalidArgumentException;
+
 /**
  * Data converter interface
  */
@@ -12,6 +14,7 @@ interface Marshaller
      *
      * @param mixed $data
      * @return string
+     * @throws InvalidArgumentException
      */
     public function marshal($data);
     
@@ -21,6 +24,7 @@ interface Marshaller
      * @param string $signature Description of the data structure
      * @param array $data
      * @return array|string|int|float|bool|null
+     * @throws InvalidArgumentException
      */
     public function unmarshal($signature, &$data);
 }
