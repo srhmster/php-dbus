@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\DataObjects;
 
 /**
@@ -23,7 +25,7 @@ class VariantDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function getValue($withSignature = false)
+    public function getValue(bool $withSignature = false): ?string
     {
         if ($this->value->getValue() === null) {
             $value = null;

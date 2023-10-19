@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\DataObjects;
 
-use InvalidArgumentException;
+use TypeError;
 
 /**
  * Struct busctl data object
@@ -13,13 +15,13 @@ class StructDataObject extends BusctlDataObject
      * Constructor
      *
      * @param BusctlDataObject|BusctlDataObject[] $value
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
     public function __construct($value)
     {
         $errorMessage = '';
         if (!$this->validate($value, $errorMessage)) {
-            throw new InvalidArgumentException($errorMessage);
+            throw new TypeError($errorMessage);
         }
         
         if ($value instanceof BusctlDataObject) {
@@ -38,7 +40,7 @@ class StructDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function getValue($withSignature = false)
+    public function getValue(bool $withSignature = false): ?string
     {
         if ($this->value instanceof BusctlDataObject) {
             $value = $this->value->getValue();
@@ -68,7 +70,7 @@ class StructDataObject extends BusctlDataObject
      * @param string $message
      * @return bool
      */
-    private function validate($value, &$message)
+    private function validate($value, string &$message): bool
     {
         if (is_array($value)) {
             if (count($value) === 0) {

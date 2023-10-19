@@ -1,26 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Tests;
 
-use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
-use Srhmster\PhpDbus\Commands\BusctlCommand;
 use Srhmster\PhpDbus\Commands\Command;
 use Srhmster\PhpDbus\PHPDbus;
 use stdClass;
+use TypeError;
 
 /**
  * PHPDbus class tests
  */
-class PHPDbusTest extends TestCase
+final class PHPDbusTest extends TestCase
 {
     /**
      * Invalid service data provider
      *
      * @return array
      */
-    public function invalidServiceDataProvider()
+    public function invalidServiceDataProvider(): array
     {
         return [
             [123],
@@ -36,7 +37,7 @@ class PHPDbusTest extends TestCase
      *
      * @return array[]
      */
-    public function invalidDataProviderForExecutedMethods()
+    public function invalidDataProviderForExecutedMethods(): array
     {
         return [
             [null, 'string', 'string'],
@@ -62,7 +63,7 @@ class PHPDbusTest extends TestCase
      *
      * @return void
      */
-    public function testCanBeCreatedFromValidService()
+    public function testCanBeCreatedFromValidService(): void
     {
         $object = new PHPDbus('test.dbus.service');
 
@@ -77,11 +78,11 @@ class PHPDbusTest extends TestCase
      * @param mixed $service
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidService($service)
+    public function testCannotBeCreatedFromInvalidService($service): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
-        $object = new PHPDbus($service);
+        new PHPDbus($service);
     }
 
     /**
@@ -98,8 +99,9 @@ class PHPDbusTest extends TestCase
         $objectPath,
         $interface,
         $method
-    ) {
-        $this->expectException(InvalidArgumentException::class);
+    ): void
+    {
+        $this->expectException(TypeError::class);
 
         $dbus = new PHPDbus('test.dbus.service', null, $this->getMockCommand());
         $dbus->call($objectPath, $interface, $method);
@@ -119,8 +121,9 @@ class PHPDbusTest extends TestCase
         $objectPath,
         $interface,
         $signal
-    ) {
-        $this->expectException(InvalidArgumentException::class);
+    ): void
+    {
+        $this->expectException(TypeError::class);
 
         $dbus = new PHPDbus('test.dbus.service', null, $this->getMockCommand());
         $dbus->emit($objectPath, $interface, $signal);
@@ -140,8 +143,9 @@ class PHPDbusTest extends TestCase
         $objectPath,
         $interface,
         $propertyName
-    ) {
-        $this->expectException(InvalidArgumentException::class);
+    ): void
+    {
+        $this->expectException(TypeError::class);
 
         $dbus = new PHPDbus('test.dbus.service', null, $this->getMockCommand());
         $dbus->getProperty($objectPath, $interface, $propertyName);
@@ -161,8 +165,9 @@ class PHPDbusTest extends TestCase
         $objectPath,
         $interface,
         $propertyName
-    ) {
-        $this->expectException(InvalidArgumentException::class);
+    ): void
+    {
+        $this->expectException(TypeError::class);
 
         $dbus = new PHPDbus('test.dbus.service', null, $this->getMockCommand());
         $dbus->setProperty($objectPath, $interface, $propertyName);
@@ -171,11 +176,11 @@ class PHPDbusTest extends TestCase
     /**
      * Get test command object
      *
-     * @return Command|PHPUnit_Framework_MockObject_MockObject
+     * @return Command|MockObject
      */
     private function getMockCommand()
     {
-        $command = $this->getMockBuilder(Command::class)->getMock();
+        $command = $this->createMock(Command::class);
         $command
             ->expects($this->any())
             ->method('execute')

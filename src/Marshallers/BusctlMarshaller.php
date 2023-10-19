@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Marshallers;
 
-use InvalidArgumentException;
-use Srhmster\PhpDbus\DataObjects\ArrayDataObject;
-use Srhmster\PhpDbus\DataObjects\BooleanDataObject;
-use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
-use Srhmster\PhpDbus\DataObjects\NumericDataObject;
-use Srhmster\PhpDbus\DataObjects\ObjectPathDataObject;
-use Srhmster\PhpDbus\DataObjects\StringDataObject;
-use Srhmster\PhpDbus\DataObjects\VariantDataObject;
+use Srhmster\PhpDbus\DataObjects\{
+    ArrayDataObject,
+    BooleanDataObject,
+    BusctlDataObject,
+    NumericDataObject,
+    ObjectPathDataObject,
+    StringDataObject,
+    VariantDataObject
+};
+use TypeError;
 
 /**
  * Busctl data converter
@@ -20,16 +24,16 @@ class BusctlMarshaller implements Marshaller
      * Convert PHP data to Dbus format
      *
      * @param BusctlDataObject|BusctlDataObject[]|null $data
-     * @return string
-     * @throws InvalidArgumentException
+     * @return string|null
+     * @throws TypeError
      */
-    public function marshal($data)
+    public function marshal($data): ?string
     {
         if (!is_null($data)
             && !($data instanceof BusctlDataObject)
             && !is_array($data)
         ) {
-            throw new InvalidArgumentException(
+            throw new TypeError(
                 'A BusctlDataObject::class, array or null data was expected, '
                 . 'but a ' . gettype($data) . ' was passed'
             );
@@ -44,16 +48,14 @@ class BusctlMarshaller implements Marshaller
         }
 
         if (count($data) === 0) {
-            throw new InvalidArgumentException(
-                'The data cannot be an empty array'
-            );
+            throw new TypeError('The data cannot be an empty array');
         }
 
         $signature = '';
         $value = '';
         foreach ($data as $dataObject) {
             if (! $dataObject instanceof BusctlDataObject) {
-                throw new InvalidArgumentException(
+                throw new TypeError(
                     'A BusctlDataObject::class data item was expected, but a '
                     . gettype($dataObject) . ' was passed'
                 );
@@ -69,22 +71,8 @@ class BusctlMarshaller implements Marshaller
     /**
      * @inheritdoc
      */
-    public function unmarshal($signature, &$data)
+    public function unmarshal(string $signature, array &$data)
     {
-        if (!is_string($signature)) {
-            throw new InvalidArgumentException(
-                'A string signature was expected, but a ' . gettype($signature)
-                . ' was passed'
-            );
-        }
-
-        if (!is_array($data)) {
-            throw new InvalidArgumentException(
-                'A array data was expected, but a ' . gettype($data)
-                . ' was passed'
-            );
-        }
-
         // Unmarshal base types
         if (strlen($signature) === 1) {
             $response = null;
@@ -203,7 +191,10 @@ class BusctlMarshaller implements Marshaller
      * @param int $pStart Start position in signature
      * @return array
      */
-    private function findArraySubtypePosition($signature, $pStart)
+    private function findArraySubtypePosition(
+        string $signature,
+        int $pStart
+    ): array
     {
         $position = [];
         

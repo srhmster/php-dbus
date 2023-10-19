@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\DataObjects;
 
-use InvalidArgumentException;
+use TypeError;
 
 /**
  * Array busctl data object
@@ -15,13 +17,13 @@ class ArrayDataObject extends BusctlDataObject
      * Constructor
      *
      * @param BusctlDataObject[] $value
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
-    public function __construct($value)
+    public function __construct(array $value)
     {
         $errorMessage = '';
         if (!$this->validate($value, $errorMessage)) {
-            throw new InvalidArgumentException($errorMessage);
+            throw new TypeError($errorMessage);
         }
         
         $this->signature = self::SIGNATURE . $value[0]->getSignature();
@@ -31,11 +33,11 @@ class ArrayDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function getValue($withSignature = false)
+    public function getValue(bool $withSignature = false): ?string
     {
         if (count($this->value) === 1
             && ($this->value[0]->getValue() === null
-                || $this->value[0]->getValue() === '0'
+                || $this->value[0]->getValue() === ''
             )
         ) {
             $value = '0';
@@ -58,15 +60,8 @@ class ArrayDataObject extends BusctlDataObject
      * @param string $message
      * @return bool
      */
-    private function validate($value, &$message)
+    private function validate(array $value, string &$message): bool
     {
-        if (!is_array($value)) {
-            $message = 'A array value was expected, but a ' . gettype($value)
-                . ' was passed';
-            
-            return false;
-        }
-        
         if (count($value) === 0) {
             $message = 'The value cannot be an empty array';
             

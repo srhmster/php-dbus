@@ -1,23 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Tests;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
-use Srhmster\PhpDbus\DataObjects\StructDataObject;
+use Srhmster\PhpDbus\DataObjects\{BusctlDataObject, StructDataObject};
+use TypeError;
 
 /**
  * StructDataObject class tests
  */
-class StructDataObjectTest extends TestCase
+final class StructDataObjectTest extends TestCase
 {
     /**
      * Valid data provider
      *
      * @return array
      */
-    public function validDataProvider()
+    public function validDataProvider(): array
     {
         return [
             [BusctlDataObject::s(), ['signature' => '(s)', 'value' => null]],
@@ -53,7 +54,7 @@ class StructDataObjectTest extends TestCase
      *
      * @return array
      */
-    public function invalidDataProvider()
+    public function invalidDataProvider(): array
     {
         return [
             ['string'],
@@ -75,7 +76,10 @@ class StructDataObjectTest extends TestCase
      * @param array $expected
      * @return void
      */
-    public function testCanBeCreatedFromValidValue($value, $expected)
+    public function testCanBeCreatedFromValidValue(
+        $value,
+        array $expected
+    ): void
     {
         $object = BusctlDataObject::r($value);
         
@@ -95,9 +99,9 @@ class StructDataObjectTest extends TestCase
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidValue($value)
+    public function testCannotBeCreatedFromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         
         BusctlDataObject::r($value);
     }

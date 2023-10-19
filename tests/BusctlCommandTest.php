@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Tests;
 
 use BadMethodCallException;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Srhmster\PhpDbus\Commands\BusctlCommand;
 use stdClass;
+use TypeError;
 
 /**
  * BusctlCommand class tests
  */
-class BusctlCommandTest extends TestCase
+final class BusctlCommandTest extends TestCase
 {
     /**
      * Valid data provider
      *
      * @return array
      */
-    public function validDataProvider()
+    public function validDataProvider(): array
     {
         return [
             ['call', false, [], [], 'busctl call'],
@@ -58,7 +60,7 @@ class BusctlCommandTest extends TestCase
      *
      * @return array
      */
-    public function invalidMethodDataProvider()
+    public function invalidMethodDataProvider(): array
     {
         return [
             [123],
@@ -74,7 +76,7 @@ class BusctlCommandTest extends TestCase
      *
      * @return array
      */
-    public function invalidUseSudoDataProvider()
+    public function invalidUseSudoDataProvider(): array
     {
         return [
             [123],
@@ -90,7 +92,7 @@ class BusctlCommandTest extends TestCase
      *
      * @return array
      */
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
         return [
             [123],
@@ -102,8 +104,8 @@ class BusctlCommandTest extends TestCase
             [[null]],
             [[[]]],
             [[new stdClass()]],
-            [['option', []]],
-            [['option', new stdClass()]]
+            [[['option', []]]],
+            [[['option', new stdClass()]]]
         ];
     }
 
@@ -112,7 +114,7 @@ class BusctlCommandTest extends TestCase
      *
      * @return array
      */
-    public function invalidAttributesDataProvider()
+    public function invalidAttributesDataProvider(): array
     {
         return [
             [123],
@@ -135,12 +137,13 @@ class BusctlCommandTest extends TestCase
      * @return void
      */
     public function testCanBeConvertedToStringFromValidData(
-        $method,
-        $useSudo,
-        $options,
-        $attributes,
-        $expected
-    ) {
+        string $method,
+        bool $useSudo,
+        array $options,
+        ?array $attributes,
+        string $expected
+    ): void
+    {
         $command = new BusctlCommand();
         $command
             ->setMethod($method)
@@ -158,9 +161,9 @@ class BusctlCommandTest extends TestCase
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeAddedInvalidMethod($value)
+    public function testCannotBeAddedInvalidMethod($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
         $command = new BusctlCommand();
         $command->setMethod($value);
@@ -174,9 +177,9 @@ class BusctlCommandTest extends TestCase
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeAddedInvalidUseSudoFlag($value)
+    public function testCannotBeAddedInvalidUseSudoFlag($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
         $command = new BusctlCommand();
         $command->setUseSudo($value);
@@ -190,9 +193,9 @@ class BusctlCommandTest extends TestCase
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeAddedInvalidOptions($value)
+    public function testCannotBeAddedInvalidOptions($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
         $command = new BusctlCommand();
         $command->addOptions($value);
@@ -206,9 +209,9 @@ class BusctlCommandTest extends TestCase
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeExecutedWithInvalidAttributes($value)
+    public function testCannotBeExecutedWithInvalidAttributes($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
         $command = new BusctlCommand();
         $command->execute($value);
@@ -219,7 +222,7 @@ class BusctlCommandTest extends TestCase
      *
      * @return void
      */
-    public function testCannotBeExecutedWithUnspecifiedMethod()
+    public function testCannotBeExecutedWithUnspecifiedMethod(): void
     {
         $this->expectException(BadMethodCallException::class);
 

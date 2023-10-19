@@ -1,26 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Tests;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
-use Srhmster\PhpDbus\DataObjects\NumericDataObject;
+use Srhmster\PhpDbus\DataObjects\{BusctlDataObject, NumericDataObject};
+use TypeError;
 
 /**
  * NumericDataObject class tests
  */
-class NumericDataObjectTest extends TestCase
+final class NumericDataObjectTest extends TestCase
 {
     /**
-     * Valid data provider
+     * Valid integer data provider
      *
      * @return array
      */
-    public function validDataProvider()
+    public function validIntegerDataProvider(): array
     {
         return [
             [123, ['value' => 123]],
+            [null, ['value' => null]],
+        ];
+    }
+
+    /**
+     * Valid double data provider
+     *
+     * @return array
+     */
+    public function validDoubleDataProvider(): array
+    {
+        return [
             [12.3, ['value' => 12.3]],
             [null, ['value' => null]],
         ];
@@ -31,7 +44,7 @@ class NumericDataObjectTest extends TestCase
      *
      * @return array
      */
-    public function invalidDataProvider()
+    public function invalidDataProvider(): array
     {
         return [
             ['string'],
@@ -40,30 +53,32 @@ class NumericDataObjectTest extends TestCase
             [BusctlDataObject::y(123)],
         ];
     }
+
+    /**
+     * Invalid integer data provider
+     *
+     * @return array
+     */
+    public function invalidIntegerDataProvider(): array
+    {
+        return [[12.3]];
+    }
     
     /**
-     * Can be created from valid value
+     * Can be created from valid integer value
      *
-     * @dataProvider validDataProvider
+     * @dataProvider validIntegerDataProvider
      *
-     * @param int|float|null $value
+     * @param int|null $value
      * @param array $expected
      * @return void
      */
-    public function testCanBeCreatedFromValidValue($value, $expected)
+    public function testCanBeCreatedFromValidIntValue(
+        ?int $value,
+        array $expected
+    ): void
     {
-        $signatures = [
-            NumericDataObject::BYTE_SIGNATURE,
-            NumericDataObject::INT16_SIGNATURE,
-            NumericDataObject::UINT16_SIGNATURE,
-            NumericDataObject::INT32_SIGNATURE,
-            NumericDataObject::UINT32_SIGNATURE,
-            NumericDataObject::INT64_SIGNATURE,
-            NumericDataObject::UINT64_SIGNATURE,
-            NumericDataObject::DOUBLE_SIGNATURE,
-        ];
-        
-        foreach ($signatures as $signature) {
+        foreach ($this->getIntSignatures() as $signature) {
             /**
              * @see BusctlDataObject::y()
              * @see BusctlDataObject::n()
@@ -72,7 +87,6 @@ class NumericDataObjectTest extends TestCase
              * @see BusctlDataObject::u()
              * @see BusctlDataObject::x()
              * @see BusctlDataObject::t()
-             * @see BusctlDataObject::d()
              *
              * @var NumericDataObject $object
              */
@@ -86,18 +100,43 @@ class NumericDataObjectTest extends TestCase
             );
         }
     }
-    
+
+    /**
+     * Can be created from valid double value
+     *
+     * @dataProvider validDoubleDataProvider
+     *
+     * @param float|null $value
+     * @param array $expected
+     * @return void
+     */
+    public function testCanBeCreatedFromValidDoubleValue(
+        ?float $value,
+        array $expected
+    ): void
+    {
+        $object = BusctlDataObject::d($value);
+
+        $this->assertInstanceOf(NumericDataObject::class, $object);
+        $this->assertEquals($expected['value'], $object->getValue());
+        $this->assertEquals(
+            NumericDataObject::DOUBLE_SIGNATURE . ' ' . $expected['value'],
+            $object->getValue(true)
+        );
+    }
+
     /**
      * Cannot be created byte from invalid value
      *
      * @dataProvider invalidDataProvider
+     * @dataProvider invalidIntegerDataProvider
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedByteFromInvalidValue($value)
+    public function testCannotBeCreatedByteFromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         
         BusctlDataObject::y($value);
     }
@@ -106,13 +145,14 @@ class NumericDataObjectTest extends TestCase
      * Cannot be created int16 from invalid value
      *
      * @dataProvider invalidDataProvider
+     * @dataProvider invalidIntegerDataProvider
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedInt16FromInvalidValue($value)
+    public function testCannotBeCreatedInt16FromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
     
         BusctlDataObject::n($value);
     }
@@ -121,13 +161,14 @@ class NumericDataObjectTest extends TestCase
      * Cannot be created uint16 from invalid value
      *
      * @dataProvider invalidDataProvider
+     * @dataProvider invalidIntegerDataProvider
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedUint16FromInvalidValue($value)
+    public function testCannotBeCreatedUint16FromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
     
         BusctlDataObject::q($value);
     }
@@ -136,13 +177,14 @@ class NumericDataObjectTest extends TestCase
      * Cannot be created int32 from invalid value
      *
      * @dataProvider invalidDataProvider
+     * @dataProvider invalidIntegerDataProvider
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedInt32FromInvalidValue($value)
+    public function testCannotBeCreatedInt32FromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
     
         BusctlDataObject::i($value);
     }
@@ -151,13 +193,14 @@ class NumericDataObjectTest extends TestCase
      * Cannot be created uint32 from invalid value
      *
      * @dataProvider invalidDataProvider
+     * @dataProvider invalidIntegerDataProvider
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedUint32FromInvalidValue($value)
+    public function testCannotBeCreatedUint32FromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
     
         BusctlDataObject::u($value);
     }
@@ -166,13 +209,14 @@ class NumericDataObjectTest extends TestCase
      * Cannot be created int64 from invalid value
      *
      * @dataProvider invalidDataProvider
+     * @dataProvider invalidIntegerDataProvider
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedInt64FromInvalidValue($value)
+    public function testCannotBeCreatedInt64FromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
     
         BusctlDataObject::x($value);
     }
@@ -181,13 +225,14 @@ class NumericDataObjectTest extends TestCase
      * Cannot be created uint64 from invalid value
      *
      * @dataProvider invalidDataProvider
+     * @dataProvider invalidIntegerDataProvider
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedUint64FromInvalidValue($value)
+    public function testCannotBeCreatedUint64FromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
     
         BusctlDataObject::t($value);
     }
@@ -200,10 +245,29 @@ class NumericDataObjectTest extends TestCase
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedDoubleFromInvalidValue($value)
+    public function testCannotBeCreatedDoubleFromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
     
         BusctlDataObject::d($value);
     }
+
+    /**
+     * Get integer signatures
+     *
+     * @return array
+     */
+    private function getIntSignatures(): array
+    {
+        return [
+            NumericDataObject::BYTE_SIGNATURE,
+            NumericDataObject::INT16_SIGNATURE,
+            NumericDataObject::UINT16_SIGNATURE,
+            NumericDataObject::INT32_SIGNATURE,
+            NumericDataObject::UINT32_SIGNATURE,
+            NumericDataObject::INT64_SIGNATURE,
+            NumericDataObject::UINT64_SIGNATURE,
+        ];
+    }
+
 }

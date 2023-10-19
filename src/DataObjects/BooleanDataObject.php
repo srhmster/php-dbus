@@ -1,8 +1,8 @@
 <?php
 
-namespace Srhmster\PhpDbus\DataObjects;
+declare(strict_types=1);
 
-use InvalidArgumentException;
+namespace Srhmster\PhpDbus\DataObjects;
 
 /**
  * Boolean busctl data object
@@ -15,17 +15,9 @@ class BooleanDataObject extends BusctlDataObject
      * Constructor
      *
      * @param bool|null $value
-     * @throws InvalidArgumentException
      */
-    public function __construct($value = null)
+    public function __construct(?bool $value)
     {
-        if (!$this->validate($value)) {
-            throw new InvalidArgumentException(
-                'A boolean or null value was expected, but a ' . gettype($value)
-                . ' was passed'
-            );
-        }
-        
         $this->signature = self::SIGNATURE;
         $this->value = $value;
     }
@@ -33,7 +25,7 @@ class BooleanDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function getValue($withSignature = false)
+    public function getValue(bool $withSignature = false): ?string
     {
         if ($this->value === null) {
             $value = null;
@@ -44,16 +36,5 @@ class BooleanDataObject extends BusctlDataObject
         return $withSignature === true
             ? $this->signature . ' ' . $value
             : $value;
-    }
-    
-    /**
-     * Check the correctness of the specified value
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    private function validate($value)
-    {
-        return is_null($value) || is_bool($value);
     }
 }

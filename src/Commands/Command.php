@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Commands;
 
 use BadMethodCallException;
-use InvalidArgumentException;
 use RuntimeException;
+use TypeError;
 
 /**
  * Console command interface
@@ -16,47 +18,45 @@ interface Command
      *
      * @param string $value
      * @return Command
-     * @throws InvalidArgumentException
      */
-    public function setMethod($value);
+    public function setMethod(string $value): Command;
 
     /**
      * Set a flag to use sudo
      *
      * @param bool $value
      * @return Command
-     * @throws InvalidArgumentException
      */
-    public function setUseSudo($value);
-    
+    public function setUseSudo(bool $value): Command;
+
     /**
      * Add option
      *
      * @param string $name
      * @param string|int|bool|null $value
      * @return Command
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
-    public function addOption($name, $value = null);
-    
+    public function addOption(string $name, $value = null): Command;
+
     /**
      * Add options
      *
      * @param array $options
      * @return Command
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
-    public function addOptions($options);
-    
+    public function addOptions(array $options): Command;
+
     /**
      * Execute command
      *
      * @param array $attributes
      * @return string|array|null
-     * @throws InvalidArgumentException|BadMethodCallException|RuntimeException
+     * @throws BadMethodCallException|RuntimeException
      */
-    public function execute($attributes = []);
-    
+    public function execute(array $attributes = []);
+
     /**
      * Convert command object to string with console command
      *
@@ -64,5 +64,5 @@ interface Command
      * @return string
      * @throws BadMethodCallException
      */
-    public function toString($attributes = []);
+    public function toString(array $attributes = []): string;
 }

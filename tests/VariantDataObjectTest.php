@@ -1,23 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Tests;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_Error;
-use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
-use Srhmster\PhpDbus\DataObjects\VariantDataObject;
+use Srhmster\PhpDbus\DataObjects\{BusctlDataObject, VariantDataObject};
+use TypeError;
 
 /**
  * VariantDataObject class tests
  */
-class VariantDataObjectTest extends TestCase
+final class VariantDataObjectTest extends TestCase
 {
     /**
      * Valid data provider
      *
      * @return array
      */
-    public function validDataProvider()
+    public function validDataProvider(): array
     {
         return [
             [BusctlDataObject::s(), ['value' => null]],
@@ -40,7 +41,7 @@ class VariantDataObjectTest extends TestCase
      *
      * @return array
      */
-    public function invalidDataProvider()
+    public function invalidDataProvider(): array
     {
         return [
             ['string'],
@@ -61,7 +62,10 @@ class VariantDataObjectTest extends TestCase
      * @param array $expected
      * @return void
      */
-    public function testCanBeCreatedFromValidValue($value, $expected)
+    public function testCanBeCreatedFromValidValue(
+        BusctlDataObject $value,
+        array $expected
+    ): void
     {
         $object = BusctlDataObject::v($value);
         
@@ -81,9 +85,9 @@ class VariantDataObjectTest extends TestCase
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidValue($value)
+    public function testCannotBeCreatedFromInvalidValue($value): void
     {
-        $this->expectException(PHPUnit_Framework_Error::class);
+        $this->expectException(TypeError::class);
         
         BusctlDataObject::v($value);
     }

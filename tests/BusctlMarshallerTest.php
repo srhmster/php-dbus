@@ -1,25 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Tests;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
-use Srhmster\PhpDbus\Marshallers\BusctlMarshaller;
-use Srhmster\PhpDbus\Marshallers\Marshaller;
+use Srhmster\PhpDbus\Marshallers\{BusctlMarshaller, Marshaller};
 use stdClass;
+use TypeError;
 
 /**
  * BusctlMarshaller class tests
  */
-class BusctlMarshallerTest extends TestCase
+final class BusctlMarshallerTest extends TestCase
 {
     /**
      * Valid data provider for marshalling
      *
      * @return array
      */
-    public function validDataProviderForMarshalling()
+    public function validDataProviderForMarshalling(): array
     {
         return [
             [null, null],
@@ -84,7 +85,7 @@ class BusctlMarshallerTest extends TestCase
      *
      * @return array
      */
-    public function validDataProviderForUnmarshalling()
+    public function validDataProviderForUnmarshalling(): array
     {
         return [
             ['e', [], null],
@@ -104,7 +105,7 @@ class BusctlMarshallerTest extends TestCase
      *
      * @return array
      */
-    public function invalidDataProviderForMarshalling()
+    public function invalidDataProviderForMarshalling(): array
     {
         return [
             [123],
@@ -121,7 +122,7 @@ class BusctlMarshallerTest extends TestCase
      *
      * @return array
      */
-    public function invalidDataProviderForUnmarshalling()
+    public function invalidDataProviderForUnmarshalling(): array
     {
         return [
             [null, []],
@@ -141,11 +142,14 @@ class BusctlMarshallerTest extends TestCase
      *
      * @dataProvider validDataProviderForMarshalling
      *
-     * @param mixed $data
-     * @param mixed $expected
+     * @param BusctlDataObject|BusctlDataObject[]|null $data
+     * @param string|null $expected
      * @return void
      */
-    public function testCanBeMarshaledFromValidData($data, $expected)
+    public function testCanBeMarshaledFromValidData(
+        $data,
+        ?string $expected
+    ): void
     {
         $marshaller = new BusctlMarshaller();
 
@@ -161,9 +165,9 @@ class BusctlMarshallerTest extends TestCase
      * @param mixed $data
      * @return void
      */
-    public function testCannotBeMarshalledFromInvalidData($data)
+    public function testCannotBeMarshalledFromInvalidData($data): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
         $marshaller = new BusctlMarshaller();
         $marshaller->marshal($data);
@@ -174,16 +178,17 @@ class BusctlMarshallerTest extends TestCase
      *
      * @dataProvider validDataProviderForUnmarshalling
      *
-     * @param mixed $signature
-     * @param mixed $data
-     * @param array $expected
+     * @param string $signature
+     * @param array $data
+     * @param mixed $expected
      * @return void
      */
     public function testCanBeUnmarshalledFromValidData(
-        $signature,
-        $data,
+        string $signature,
+        array $data,
         $expected
-    ) {
+    ): void
+    {
         $marshaller = new BusctlMarshaller();
 
         $this->assertInstanceOf(Marshaller::class, $marshaller);
@@ -199,9 +204,12 @@ class BusctlMarshallerTest extends TestCase
      * @param mixed $data
      * @return void
      */
-    public function testCannotBeUnmarshalledFromInvalidData($signature, $data)
+    public function testCannotBeUnmarshalledFromInvalidData(
+        $signature,
+        $data
+    ): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
         $marshaller = new BusctlMarshaller();
         $marshaller->unmarshal($signature, $data);

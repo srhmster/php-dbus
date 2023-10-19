@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Commands;
 
 use BadMethodCallException;
-use InvalidArgumentException;
 use RuntimeException;
+use TypeError;
 
 /**
  * Busctl console command
@@ -37,15 +39,8 @@ class BusctlCommand implements Command
     /**
      * @inheritdoc
      */
-    public function setMethod($value)
+    public function setMethod(string $value): Command
     {
-        if (!is_string($value)) {
-            throw new InvalidArgumentException(
-                'A string method was expected, but a ' . gettype($value)
-                . ' was passed'
-            );
-        }
-
         $this->method = $value;
 
         return $this;
@@ -54,15 +49,8 @@ class BusctlCommand implements Command
     /**
      * @inheritdoc
      */
-    public function setUseSudo($value)
+    public function setUseSudo(bool $value): Command
     {
-        if (!is_bool($value)) {
-            throw new InvalidArgumentException(
-                'A boolean use sudo flag was expected, but a ' . gettype($value)
-                . ' was passed'
-            );
-        }
-
         $this->useSudo = $value;
         
         return $this;
@@ -71,21 +59,14 @@ class BusctlCommand implements Command
     /**
      * @inheritdoc
      */
-    public function addOption($name, $value = null)
+    public function addOption(string $name, $value = null): Command
     {
-        if (!is_string($name)) {
-            throw new InvalidArgumentException(
-                'A string option name was expected, but a ' . gettype($name)
-                . ' was passed'
-            );
-        }
-        
         if (!is_string($value)
             && !is_numeric($value)
             && !is_bool($value)
             && !is_null($value)
         ) {
-            throw new InvalidArgumentException(
+            throw new TypeError(
                 'A string, numeric, boolean or null option value was expected, '
                 . 'but a ' . gettype($value) . ' was passed'
             );
@@ -115,17 +96,10 @@ class BusctlCommand implements Command
      *
      * @param array $options
      * @return Command
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
-    public function addOptions($options)
+    public function addOptions(array $options): Command
     {
-        if (!is_array($options)) {
-            throw new InvalidArgumentException(
-                'A array options was expected, but a ' . gettype($options)
-                . ' was passed'
-            );
-        }
-
         foreach ($options as $option) {
             if (is_array($option) && isset($option[0]) && isset($option[1])) {
                 $this->addOption($option[0], $option[1]);
@@ -140,17 +114,10 @@ class BusctlCommand implements Command
     /**
      * @inheritdoc
      */
-    public function execute($attributes = [])
+    public function execute(array $attributes = [])
     {
-        if (!is_array($attributes)) {
-            throw new InvalidArgumentException(
-                'A array value was expected, but a ' . gettype($attributes)
-                . ' was passed'
-            );
-        }
-
         $response = null;
-        $code = null;
+        $code = 0;
     
         exec($this->toString($attributes) . ' 2>&1', $response, $code);
         if ($code !== 0) {
@@ -171,7 +138,7 @@ class BusctlCommand implements Command
     /**
      * @inheritdoc
      */
-    public function toString($attributes = [])
+    public function toString(array $attributes = []): string
     {
         if (!isset($this->method)) {
             throw new BadMethodCallException("Method command not specified");

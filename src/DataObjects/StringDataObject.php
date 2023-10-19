@@ -1,8 +1,8 @@
 <?php
 
-namespace Srhmster\PhpDbus\DataObjects;
+declare(strict_types=1);
 
-use InvalidArgumentException;
+namespace Srhmster\PhpDbus\DataObjects;
 
 /**
  * String busctl data object
@@ -15,17 +15,9 @@ class StringDataObject extends BusctlDataObject
      * Constructor
      *
      * @param string|null $value
-     * @throws InvalidArgumentException
      */
-    public function __construct($value = null)
+    public function __construct(?string $value)
     {
-        if (!$this->validate($value)) {
-            throw new InvalidArgumentException(
-                'A string or null value was expected, but a ' . gettype($value)
-                . ' was passed'
-            );
-        }
-        
         $this->signature = self::SIGNATURE;
         $this->value = $value;
     }
@@ -33,7 +25,7 @@ class StringDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function getValue($withSignature = false)
+    public function getValue(bool $withSignature = false): ?string
     {
         $value = $this->value === null
             ? $this->value
@@ -42,16 +34,5 @@ class StringDataObject extends BusctlDataObject
         return $withSignature === true
             ? $this->signature . ' ' . $value
             : $value;
-    }
-    
-    /**
-     * Check the correctness of the specified value
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    private function validate($value)
-    {
-        return is_null($value) || is_string($value);
     }
 }

@@ -1,23 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\Tests;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
-use Srhmster\PhpDbus\DataObjects\MapDataObject;
+use Srhmster\PhpDbus\DataObjects\{BusctlDataObject, MapDataObject};
+use TypeError;
 
 /**
  * MapDataObject class tests
  */
-class MapDataObjectTest extends TestCase
+final class MapDataObjectTest extends TestCase
 {
     /**
      * Valid data provider
      *
      * @return array
      */
-    public function validDataProvider()
+    public function validDataProvider(): array
     {
         return [
             [
@@ -67,7 +68,7 @@ class MapDataObjectTest extends TestCase
      *
      * @return array
      */
-    public function invalidDataProvider()
+    public function invalidDataProvider(): array
     {
         return [
             ['string'],
@@ -124,7 +125,10 @@ class MapDataObjectTest extends TestCase
      * @param array $expected
      * @return void
      */
-    public function testCanBeCreatedFromValidValue($value, $expected)
+    public function testCanBeCreatedFromValidValue(
+        array $value,
+        array $expected
+    ): void
     {
         $object = BusctlDataObject::e($value);
         
@@ -144,9 +148,9 @@ class MapDataObjectTest extends TestCase
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidValue($value)
+    public function testCannotBeCreatedFromInvalidValue($value): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         
         BusctlDataObject::e($value);
     }

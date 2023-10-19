@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\DataObjects;
 
-use InvalidArgumentException;
+use TypeError;
 
 /**
  * Object path busctl data object
@@ -15,15 +17,14 @@ class ObjectPathDataObject extends BusctlDataObject
      * Constructor
      *
      * @param string|null $value
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
-    public function __construct($value = null)
+    public function __construct(?string $value)
     {
-        if (!$this->validate($value)) {
-            throw new InvalidArgumentException(
-                'A object path or null was expected, but ' . gettype($value)
-                . ' was passed'
-            );
+        if (!is_null($value)
+            && !preg_match('/^(\/|(\/[a-zA-Z0-9_]+)+)$/', $value)
+        ) {
+            throw new TypeError('Invalid path to object specified');
         }
         
         $this->signature = self::SIGNATURE;
@@ -33,24 +34,10 @@ class ObjectPathDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function getValue($withSignature = false)
+    public function getValue(bool $withSignature = false): ?string
     {
         return $withSignature === true
             ? $this->signature . ' ' . $this->value
             : $this->value;
-    }
-    
-    /**
-     * Check the correctness of the specified value
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    private function validate($value)
-    {
-        return is_null($value)
-            || (is_string($value)
-                && preg_match('/^(\/|(\/[a-zA-Z0-9_]+)+)$/', $value)
-            );
     }
 }

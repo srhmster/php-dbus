@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
 use Srhmster\PhpDbus\PHPDbus;
 

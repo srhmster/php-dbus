@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Srhmster\PhpDbus\DataObjects;
 
-use InvalidArgumentException;
+use TypeError;
 
 /**
  * Numeric busctl data object
@@ -23,12 +25,12 @@ class NumericDataObject extends BusctlDataObject
      *
      * @param string $signature
      * @param int|float|null $value
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
-    public function __construct($signature, $value = null)
+    public function __construct(string $signature, $value = null)
     {
         if (!$this->validateSignature($signature)) {
-            throw new InvalidArgumentException(
+            throw new TypeError(
                 'One of the signature values ('
                 . implode(',', $this->getValidSignatures())
                 . ') was expected, but ' . $signature . ' was passed'
@@ -36,7 +38,7 @@ class NumericDataObject extends BusctlDataObject
         }
         
         if (!$this->validateValue($value)) {
-            throw new InvalidArgumentException(
+            throw new TypeError(
                 'A numeric or null value was expected, but ' . gettype($value)
                 . ' was passed'
             );
@@ -49,11 +51,11 @@ class NumericDataObject extends BusctlDataObject
     /**
      * @inheritDoc
      */
-    public function getValue($withSignature = false)
+    public function getValue(bool $withSignature = false): ?string
     {
         return $withSignature === true
             ? $this->signature . ' ' . $this->value
-            : $this->value;
+            : (string)$this->value;
     }
     
     /**
@@ -61,7 +63,7 @@ class NumericDataObject extends BusctlDataObject
      *
      * @return string[]
      */
-    private function getValidSignatures()
+    private function getValidSignatures(): array
     {
         return [
             self::BYTE_SIGNATURE,
@@ -81,7 +83,7 @@ class NumericDataObject extends BusctlDataObject
      * @param string $signature
      * @return bool
      */
-    private function validateSignature($signature)
+    private function validateSignature(string $signature): bool
     {
         return in_array($signature, $this->getValidSignatures());
     }
@@ -92,7 +94,7 @@ class NumericDataObject extends BusctlDataObject
      * @param mixed $value
      * @return bool
      */
-    private function validateValue($value)
+    private function validateValue($value): bool
     {
         return is_null($value) || is_numeric($value);
     }
