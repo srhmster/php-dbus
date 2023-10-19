@@ -79,6 +79,17 @@ class BusctlCommand implements Command
                 . ' was passed'
             );
         }
+        
+        if (!is_string($value)
+            && !is_numeric($value)
+            && !is_bool($value)
+            && !is_null($value)
+        ) {
+            throw new InvalidArgumentException(
+                'A string, numeric, boolean or null option value was expected, '
+                . 'but a ' . gettype($value) . ' was passed'
+            );
+        }
 
         $this->options[$name] = $value;
         

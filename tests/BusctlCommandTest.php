@@ -102,6 +102,8 @@ class BusctlCommandTest extends TestCase
             [[null]],
             [[[]]],
             [[new stdClass()]],
+            [['option', []]],
+            [['option', new stdClass()]]
         ];
     }
 
