@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Srhmster\PhpDbus\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Srhmster\PhpDbus\Commands\Command;
 use Srhmster\PhpDbus\PHPDbus;
-use stdClass;
+use Srhmster\PhpDbus\Tests\DataProviders\PHPDbusDataProvider;
 use TypeError;
 
 /**
@@ -16,48 +18,6 @@ use TypeError;
  */
 final class PHPDbusTest extends TestCase
 {
-    /**
-     * Invalid service data provider
-     *
-     * @return array
-     */
-    public function invalidServiceDataProvider(): array
-    {
-        return [
-            [123],
-            [null],
-            [true],
-            [[]],
-            [new stdClass()]
-        ];
-    }
-
-    /**
-     * Invalid data provider for executed command methods
-     *
-     * @return array[]
-     */
-    public function invalidDataProviderForExecutedMethods(): array
-    {
-        return [
-            [null, 'string', 'string'],
-            [123, 'string', 'string'],
-            [true, 'string', 'string'],
-            [[], 'string', 'string'],
-            [new stdClass(), 'string', 'string'],
-            ['string', null, 'string'],
-            ['string', 123, 'string'],
-            ['string', true, 'string'],
-            ['string', [], 'string'],
-            ['string', new stdClass(), 'string'],
-            ['string', 'string', null],
-            ['string', 'string', 123],
-            ['string', 'string', true],
-            ['string', 'string', []],
-            ['string', 'string', new stdClass()],
-        ];
-    }
-
     /**
      * Can be created from valid service
      *
@@ -73,12 +33,13 @@ final class PHPDbusTest extends TestCase
     /**
      * Cannot be created from invalid service
      *
-     * @dataProvider invalidServiceDataProvider
+     * @see PHPDbusDataProvider::invalidServiceData()
      *
      * @param mixed $service
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidService($service): void
+    #[DataProviderExternal(PHPDbusDataProvider::class, 'invalidServiceData')]
+    public function testCannotBeCreatedFromInvalidService(mixed $service): void
     {
         $this->expectException(TypeError::class);
 
@@ -88,17 +49,19 @@ final class PHPDbusTest extends TestCase
     /**
      * Cannot be executed call method from invalid data
      *
-     * @dataProvider invalidDataProviderForExecutedMethods
+     * @see PHPDbusDataProvider::invalidExecutedMethodsData()
      *
      * @param mixed $objectPath
      * @param mixed $interface
      * @param mixed $method
      * @return void
+     * @throws Exception
      */
+    #[DataProviderExternal(PHPDbusDataProvider::class, 'invalidExecutedMethodsData')]
     public function testCannotBeExecutedCallMethodFromInvalidData(
-        $objectPath,
-        $interface,
-        $method
+        mixed $objectPath,
+        mixed $interface,
+        mixed $method
     ): void
     {
         $this->expectException(TypeError::class);
@@ -110,17 +73,19 @@ final class PHPDbusTest extends TestCase
     /**
      * Cannot be executed emit method from invalid data
      *
-     * @dataProvider invalidDataProviderForExecutedMethods
+     * @see PHPDbusDataProvider::invalidExecutedMethodsData()
      *
      * @param mixed $objectPath
      * @param mixed $interface
      * @param mixed $signal
      * @return void
+     * @throws Exception
      */
+    #[DataProviderExternal(PHPDbusDataProvider::class, 'invalidExecutedMethodsData')]
     public function testCannotBeExecutedEmitMethodFromInvalidData(
-        $objectPath,
-        $interface,
-        $signal
+        mixed $objectPath,
+        mixed $interface,
+        mixed $signal
     ): void
     {
         $this->expectException(TypeError::class);
@@ -132,17 +97,19 @@ final class PHPDbusTest extends TestCase
     /**
      * Cannot be executed get-property method from invalid data
      *
-     * @dataProvider invalidDataProviderForExecutedMethods
+     * @see PHPDbusDataProvider::invalidExecutedMethodsData()
      *
      * @param mixed $objectPath
      * @param mixed $interface
      * @param mixed $propertyName
      * @return void
+     * @throws Exception
      */
+    #[DataProviderExternal(PHPDbusDataProvider::class, 'invalidExecutedMethodsData')]
     public function testCannotBeExecutedGetPropertyMethodFromInvalidData(
-        $objectPath,
-        $interface,
-        $propertyName
+        mixed $objectPath,
+        mixed $interface,
+        mixed $propertyName
     ): void
     {
         $this->expectException(TypeError::class);
@@ -150,21 +117,23 @@ final class PHPDbusTest extends TestCase
         $dbus = new PHPDbus('test.dbus.service', null, $this->getMockCommand());
         $dbus->getProperty($objectPath, $interface, $propertyName);
     }
-
+    
     /**
      * Cannot be executed set-property method from invalid data
      *
-     * @dataProvider invalidDataProviderForExecutedMethods
+     * @see PHPDbusDataProvider::invalidExecutedMethodsData()
      *
      * @param mixed $objectPath
      * @param mixed $interface
      * @param mixed $propertyName
      * @return void
+     * @throws Exception
      */
+    #[DataProviderExternal(PHPDbusDataProvider::class, 'invalidExecutedMethodsData')]
     public function testCannotBeExecutedSetPropertyMethodFromInvalidData(
-        $objectPath,
-        $interface,
-        $propertyName
+        mixed $objectPath,
+        mixed $interface,
+        mixed $propertyName
     ): void
     {
         $this->expectException(TypeError::class);
@@ -172,20 +141,18 @@ final class PHPDbusTest extends TestCase
         $dbus = new PHPDbus('test.dbus.service', null, $this->getMockCommand());
         $dbus->setProperty($objectPath, $interface, $propertyName);
     }
-
+    
     /**
      * Get test command object
      *
-     * @return Command|MockObject
+     * @return MockObject|Command
+     * @throws Exception
      */
-    private function getMockCommand()
+    private function getMockCommand(): Command|MockObject
     {
-        $command = $this->createMock(Command::class);
-        $command
-            ->expects($this->any())
-            ->method('execute')
-            ->will($this->returnValue('s "hello world"'));
-
-        return $command;
+        return $this->createConfiguredMock(
+            Command::class,
+            ['execute' => 's "hello world"']
+        );
     }
 }

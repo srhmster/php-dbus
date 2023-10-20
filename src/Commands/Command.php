@@ -6,7 +6,6 @@ namespace Srhmster\PhpDbus\Commands;
 
 use BadMethodCallException;
 use RuntimeException;
-use TypeError;
 
 /**
  * Console command interface
@@ -33,18 +32,19 @@ interface Command
      * Add option
      *
      * @param string $name
-     * @param string|int|bool|null $value
+     * @param string|int|float|bool|null $value
      * @return Command
-     * @throws TypeError
      */
-    public function addOption(string $name, $value = null): Command;
+    public function addOption(
+        string $name,
+        string|int|float|bool|null $value = null
+    ): Command;
 
     /**
      * Add options
      *
      * @param array $options
      * @return Command
-     * @throws TypeError
      */
     public function addOptions(array $options): Command;
 
@@ -55,7 +55,7 @@ interface Command
      * @return string|array|null
      * @throws BadMethodCallException|RuntimeException
      */
-    public function execute(array $attributes = []);
+    public function execute(array $attributes = []): string|array|null;
 
     /**
      * Convert command object to string with console command

@@ -6,7 +6,6 @@ namespace Srhmster\PhpDbus\Commands;
 
 use BadMethodCallException;
 use RuntimeException;
-use TypeError;
 
 /**
  * Busctl console command
@@ -20,21 +19,21 @@ class BusctlCommand implements Command
      *
      * @var string
      */
-    private $method;
+    private string $method;
     
     /**
      * Sudo use flag
      *
      * @var bool
      */
-    private $useSudo = false;
+    private bool $useSudo = false;
     
     /**
      * Command options
      *
      * @var array
      */
-    private $options = [];
+    private array $options = [];
 
     /**
      * @inheritdoc
@@ -59,19 +58,11 @@ class BusctlCommand implements Command
     /**
      * @inheritdoc
      */
-    public function addOption(string $name, $value = null): Command
+    public function addOption(
+        string $name,
+        string|int|float|bool|null $value = null
+    ): Command
     {
-        if (!is_string($value)
-            && !is_numeric($value)
-            && !is_bool($value)
-            && !is_null($value)
-        ) {
-            throw new TypeError(
-                'A string, numeric, boolean or null option value was expected, '
-                . 'but a ' . gettype($value) . ' was passed'
-            );
-        }
-
         $this->options[$name] = $value;
         
         return $this;
@@ -96,7 +87,6 @@ class BusctlCommand implements Command
      *
      * @param array $options
      * @return Command
-     * @throws TypeError
      */
     public function addOptions(array $options): Command
     {
@@ -114,7 +104,7 @@ class BusctlCommand implements Command
     /**
      * @inheritdoc
      */
-    public function execute(array $attributes = [])
+    public function execute(array $attributes = []): string|array|null
     {
         $response = null;
         $code = 0;

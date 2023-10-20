@@ -25,21 +25,21 @@ class PHPDbus
      *
      * @var string
      */
-    private $service;
+    private string $service;
     
     /**
      * Data converter
      *
      * @var Marshaller
      */
-    private $marshaller;
+    private Marshaller $marshaller;
     
     /**
      * Console command
      *
      * @var Command
      */
-    private $command;
+    private Command $command;
 
     /**
      * Constructor
@@ -50,8 +50,8 @@ class PHPDbus
      */
     public function __construct(
         string $service,
-        Marshaller $marshaller = null,
-        Command $command = null
+        ?Marshaller $marshaller = null,
+        ?Command $command = null
     ) {
         $this->service = $service;
         $this->marshaller = $marshaller ?: new BusctlMarshaller();
@@ -64,7 +64,7 @@ class PHPDbus
      * @param string $objectPath
      * @param string $interface
      * @param string $method
-     * @param mixed|null $properties
+     * @param mixed $properties
      * @param bool $useSudo
      * @param array $options
      * @return array|string|int|float|bool|null
@@ -74,10 +74,11 @@ class PHPDbus
         string $objectPath,
         string $interface,
         string $method,
-        $properties = null,
+        mixed $properties = null,
         bool $useSudo = false,
         array $options = []
-    ) {
+    ): array|string|int|float|bool|null
+    {
         $response = $this->command
             ->setMethod(self::CALL)
             ->setUseSudo($useSudo)
@@ -91,7 +92,7 @@ class PHPDbus
             ]);
 
         if (!is_null($response)) {
-            $data = explode(' ', $response);
+            $data = $this->marshaller->unmarshallingPrepare($response);
             $signature = array_shift($data);
 
             return $this->marshaller->unmarshal($signature, $data);
@@ -106,7 +107,7 @@ class PHPDbus
      * @param string $objectPath
      * @param string $interface
      * @param string $signal
-     * @param mixed|null $value
+     * @param mixed $value
      * @param bool $useSudo
      * @param array $options
      * @return void
@@ -116,7 +117,7 @@ class PHPDbus
         string $objectPath,
         string $interface,
         string $signal,
-        $value = null,
+        mixed $value = null,
         bool $useSudo = false,
         array $options = []
     ): void
@@ -151,7 +152,8 @@ class PHPDbus
         string $name,
         bool $useSudo = false,
         array $options = []
-    ) {
+    ): array|string|int|float|bool|null
+    {
         $response = $this->command
             ->setMethod(self::GET_PROPERTY)
             ->setUseSudo($useSudo)
@@ -164,7 +166,7 @@ class PHPDbus
             ]);
         
         if (!is_null($response)) {
-            $data = explode(' ', $response);
+            $data = $this->marshaller->unmarshallingPrepare($response);
             $signature = array_shift($data);
             
             return $this->marshaller->unmarshal($signature, $data);
@@ -179,7 +181,7 @@ class PHPDbus
      * @param string $objectPath
      * @param string $interface
      * @param string $name
-     * @param mixed|null $value
+     * @param mixed $value
      * @param bool $useSudo
      * @param array $options
      * @return void
@@ -189,7 +191,7 @@ class PHPDbus
         string $objectPath,
         string $interface,
         string $name,
-        $value = null,
+        mixed $value = null,
         bool $useSudo = false,
         array $options = []
     ): void

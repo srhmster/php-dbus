@@ -18,7 +18,7 @@ interface Marshaller
      * @return string|null
      * @throws TypeError
      */
-    public function marshal($data): ?string;
+    public function marshal(mixed $data): ?string;
     
     /**
      * Convert Dbus data to PHP format
@@ -27,5 +27,16 @@ interface Marshaller
      * @param array $data
      * @return array|string|int|float|bool|null
      */
-    public function unmarshal(string $signature, array &$data);
+    public function unmarshal(
+        string $signature,
+        array &$data
+    ): array|string|int|float|bool|null;
+    
+    /**
+     * Prepare data for the unmarshalling process
+     *
+     * @param mixed $data
+     * @return array
+     */
+    public function unmarshallingPrepare(mixed $data): array;
 }

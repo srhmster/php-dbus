@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Srhmster\PhpDbus\DataObjects\BusctlDataObject;
 use Srhmster\PhpDbus\PHPDbus;
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $dbus = new PHPDbus('org.freedesktop.NetworkManager');
 
@@ -18,7 +18,7 @@ $devices = $dbus->getProperty(
 
 // Get object path to first device active connection
 $activeConnection = $dbus->getProperty(
-    $devices[0],
+    $devices[1],
     'org.freedesktop.NetworkManager.Device',
     'ActiveConnection'
 );
@@ -115,5 +115,6 @@ $dbus->call(
                 ]
             ])
         ]
-    ])
+    ]),
+    true
 );
