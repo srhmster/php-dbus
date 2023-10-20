@@ -17,7 +17,7 @@ class StructDataObject extends BusctlDataObject
      * @param BusctlDataObject|BusctlDataObject[] $value
      * @throws TypeError
      */
-    public function __construct($value)
+    public function __construct(BusctlDataObject|array $value)
     {
         $errorMessage = '';
         if (!$this->validate($value, $errorMessage)) {
@@ -70,7 +70,10 @@ class StructDataObject extends BusctlDataObject
      * @param string $message
      * @return bool
      */
-    private function validate($value, string &$message): bool
+    private function validate(
+        BusctlDataObject|array $value,
+        string &$message
+    ): bool
     {
         if (is_array($value)) {
             if (count($value) === 0) {

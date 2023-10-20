@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Srhmster\PhpDbus\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use Srhmster\PhpDbus\DataObjects\{BusctlDataObject, StringDataObject};
+use Srhmster\PhpDbus\Tests\DataProviders\DataObjectDataProvider;
 use TypeError;
 
 /**
@@ -14,43 +16,15 @@ use TypeError;
 final class StringDataObjectTest extends TestCase
 {
     /**
-     * Valid data provider
-     *
-     * @return array
-     */
-    public function validDataProvider(): array
-    {
-        return [
-            ['string', ['value' => '"string"']],
-            [null, ['value' => null]],
-        ];
-    }
-    
-    /**
-     * Invalid data provider
-     *
-     * @return array
-     */
-    public function invalidDataProvider(): array
-    {
-        return [
-            [123],
-            [12.3],
-            [true],
-            [[]],
-            [BusctlDataObject::s('string')],
-        ];
-    }
-    
-    /**
      * Can be created from valid value
      *
-     * @dataProvider validDataProvider
+     * @see DataObjectDataProvider::validStringData()
      *
      * @param string|null $value
      * @param array $expected
      * @return void
      */
+    #[DataProviderExternal(DataObjectDataProvider::class, 'validStringData')]
     public function testCanBeCreatedFromValidValue(
         ?string $value,
         array $expected
@@ -69,12 +43,13 @@ final class StringDataObjectTest extends TestCase
     /**
      * Cannot be created from invalid value
      *
-     * @dataProvider invalidDataProvider
+     * @see DataObjectDataProvider::invalidStringData()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidStringData')]
+    public function testCannotBeCreatedFromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
         

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Srhmster\PhpDbus\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use Srhmster\PhpDbus\DataObjects\{ArrayDataObject, BusctlDataObject};
+use Srhmster\PhpDbus\Tests\DataProviders\DataObjectDataProvider;
 use TypeError;
 
 /**
@@ -14,60 +16,15 @@ use TypeError;
 final class ArrayDataObjectTest extends TestCase
 {
     /**
-     * Valid data provider
-     *
-     * @return array
-     */
-    public function validDataProvider(): array
-    {
-        return [
-            [
-                [BusctlDataObject::s('hello'), BusctlDataObject::s('world')],
-                ['signature' => 'as', 'value' => '2 "hello" "world"'],
-            ],
-            [
-                [
-                    BusctlDataObject::a([BusctlDataObject::s('hello')]),
-                    BusctlDataObject::a([BusctlDataObject::s('world')]),
-                ],
-                ['signature' => 'aas', 'value' => '2 1 "hello" 1 "world"'],
-            ],
-            [
-                [BusctlDataObject::s()],
-                ['signature' => 'as', 'value' => '0'],
-            ]
-        ];
-    }
-    
-    /**
-     * Invalid data objects data provider
-     *
-     * @return array
-     */
-    public function invalidDataProvider(): array
-    {
-        return [
-            ['string'],
-            [123],
-            [12.3],
-            [true],
-            [null],
-            [BusctlDataObject::s('string')],
-            [[]],
-            [[BusctlDataObject::s('string'), BusctlDataObject::y(123)]],
-            [[BusctlDataObject::s('hello'), 'world']],
-        ];
-    }
-    
-    /**
      * Can be created from valid value
      *
-     * @dataProvider validDataProvider
+     * @see DataObjectDataProvider::validArrayData()
      *
      * @param BusctlDataObject[] $value
      * @param array $expected
      * @return void
      */
+    #[DataProviderExternal(DataObjectDataProvider::class, 'validArrayData')]
     public function testCanBeCreatedFromValidValue(
         array $value,
         array $expected
@@ -86,12 +43,13 @@ final class ArrayDataObjectTest extends TestCase
     /**
      * Cannot be created from invalid value
      *
-     * @dataProvider invalidDataProvider
+     * @see DataObjectDataProvider::invalidArrayData()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidArrayData')]
+    public function testCannotBeCreatedFromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
 

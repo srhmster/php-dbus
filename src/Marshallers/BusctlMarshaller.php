@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Srhmster\PhpDbus\Marshallers;
 
-use Srhmster\PhpDbus\DataObjects\{
-    ArrayDataObject,
+use Srhmster\PhpDbus\DataObjects\{ArrayDataObject,
     BooleanDataObject,
     BusctlDataObject,
-    NumericDataObject,
+    NumericSignature,
     ObjectPathDataObject,
     StringDataObject,
-    VariantDataObject
-};
+    VariantDataObject};
 use TypeError;
 
 /**
@@ -27,7 +25,7 @@ class BusctlMarshaller implements Marshaller
      * @return string|null
      * @throws TypeError
      */
-    public function marshal($data): ?string
+    public function marshal(mixed $data): ?string
     {
         if (!is_null($data)
             && !($data instanceof BusctlDataObject)
@@ -71,38 +69,31 @@ class BusctlMarshaller implements Marshaller
     /**
      * @inheritdoc
      */
-    public function unmarshal(string $signature, array &$data)
+    public function unmarshal(
+        string $signature,
+        array &$data
+    ): array|string|int|float|bool|null
     {
         // Unmarshal base types
         if (strlen($signature) === 1) {
-            $response = null;
-        
-            switch ($signature) {
-                case StringDataObject::SIGNATURE:
-                case ObjectPathDataObject::SIGNATURE:
-                    $response = str_replace('"', '', array_shift($data));
-                    break;
-                case NumericDataObject::BYTE_SIGNATURE:
-                case NumericDataObject::INT16_SIGNATURE:
-                case NumericDataObject::UINT16_SIGNATURE:
-                case NumericDataObject::INT32_SIGNATURE:
-                case NumericDataObject::UINT32_SIGNATURE:
-                case NumericDataObject::INT64_SIGNATURE:
-                case NumericDataObject::UINT64_SIGNATURE:
-                case NumericDataObject::DOUBLE_SIGNATURE:
-                    $response = array_shift($data) * 1;
-                    break;
-                case BooleanDataObject::SIGNATURE:
-                    $response = array_shift($data) === 'true';
-                    break;
-                case VariantDataObject::SIGNATURE:
-                    $response = $this->unmarshal(array_shift($data), $data);
-                    break;
-            }
-        
-            return $response;
+            return match ($signature) {
+                StringDataObject::SIGNATURE,
+                ObjectPathDataObject::SIGNATURE =>
+                    str_replace('"', '', array_shift($data)),
+                NumericSignature::Byte->value,
+                NumericSignature::Int16->value,
+                NumericSignature::UInt16->value,
+                NumericSignature::Int32->value,
+                NumericSignature::UInt32->value,
+                NumericSignature::Int64->value,
+                NumericSignature::UInt64->value => (int)array_shift($data),
+                NumericSignature::Double->value => (float)array_shift($data),
+                BooleanDataObject::SIGNATURE => array_shift($data) === 'true',
+                VariantDataObject::SIGNATURE =>
+                    $this->unmarshal(array_shift($data), $data),
+                default => null
+            };
         }
-    
         // Unmarshal sequence base types or container types
         $response = [];
         $position = 0;
@@ -182,6 +173,38 @@ class BusctlMarshaller implements Marshaller
         }
     
         return $response;
+    }
+    
+    /**
+     * Prepare data for the unmarshalling process
+     *
+     * Replacing spaces inside string values so that a data array can be
+     * formed correctly
+     *
+     * @param string $data
+     * @return array
+     */
+    public function unmarshallingPrepare(mixed $data): array
+    {
+        preg_match_all('/\".*\"/U', $data, $matches);
+        
+        $replaced = [];
+        foreach ($matches[0] as $match) {
+            if (!preg_match('/\s/', $match)) continue;
+    
+            $tmp = str_replace(' ', '-', $match);
+            $replaced[$tmp] = $match;
+            $data = str_replace($match, $tmp, $data);
+        }
+    
+        $preparedData = explode(' ', $data);
+        array_walk($preparedData, function (&$value, $key, $replaced) {
+            if (isset($replaced[$value])) {
+                $value = $replaced[$value];
+            }
+        }, $replaced);
+        
+        return $preparedData;
     }
     
     /**

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Srhmster\PhpDbus\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use Srhmster\PhpDbus\DataObjects\{BusctlDataObject, MapDataObject};
+use Srhmster\PhpDbus\Tests\DataProviders\DataObjectDataProvider;
 use TypeError;
 
 /**
@@ -14,117 +16,15 @@ use TypeError;
 final class MapDataObjectTest extends TestCase
 {
     /**
-     * Valid data provider
-     *
-     * @return array
-     */
-    public function validDataProvider(): array
-    {
-        return [
-            [
-                [
-                    [
-                        'key' => BusctlDataObject::s(),
-                        'value' => BusctlDataObject::y(),
-                    ]
-                ],
-                [
-                    'signature' => 'a{sy}',
-                    'value' => '0'
-                ]
-            ],
-            [
-                [
-                    [
-                        'key' => BusctlDataObject::s('hello'),
-                        'value' => BusctlDataObject::s('world'),
-                    ]
-                ],
-                [
-                    'signature' => 'a{ss}',
-                    'value' => '1 "hello" "world"'
-                ]
-            ],
-            [
-                [
-                    [
-                        'key' => BusctlDataObject::s('hello'),
-                        'value' => BusctlDataObject::a([
-                            BusctlDataObject::s('old world'),
-                            BusctlDataObject::s('new world'),
-                        ])
-                    ]
-                ],
-                [
-                    'signature' => 'a{sas}',
-                    'value' => '1 "hello" 2 "old world" "new world"'
-                ]
-            ]
-        ];
-    }
-    
-    /**
-     * Invalid data provider
-     *
-     * @return array
-     */
-    public function invalidDataProvider(): array
-    {
-        return [
-            ['string'],
-            [123],
-            [12.3],
-            [true],
-            [null],
-            [[]],
-            [BusctlDataObject::s('string')],
-            [
-                ['hello', 'world'],
-            ],
-            [
-                [
-                    [
-                        BusctlDataObject::s('hello'),
-                        BusctlDataObject::s('world'),
-                    ],
-                ],
-            ],
-            [
-                [
-                    [
-                        'key' => BusctlDataObject::r(BusctlDataObject::s('key')),
-                        'value' => BusctlDataObject::y(123),
-                    ]
-                ]
-            ],
-            [
-                [
-                    [
-                        'key' => null,
-                        'value' => BusctlDataObject::s('string')
-                    ]
-                ]
-            ],
-            [
-                [
-                    [
-                        'key' => BusctlDataObject::s('string'),
-                        'value' => null,
-                    ]
-                ]
-            ]
-        ];
-    }
-    
-    /**
      * Can be created from valid value
      *
-     * @dataProvider validDataProvider
+     * @see DataObjectDataProvider::validMapData()
      *
      * @param BusctlDataObject[][] $value
      * @param array $expected
      * @return void
      */
+    #[DataProviderExternal(DataObjectDataProvider::class, 'validMapData')]
     public function testCanBeCreatedFromValidValue(
         array $value,
         array $expected
@@ -143,12 +43,13 @@ final class MapDataObjectTest extends TestCase
     /**
      * Cannot be created from invalid value
      *
-     * @dataProvider invalidDataProvider
+     * @see DataObjectDataProvider::invalidMapData()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidMapData')]
+    public function testCannotBeCreatedFromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
         

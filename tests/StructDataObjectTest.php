@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Srhmster\PhpDbus\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use Srhmster\PhpDbus\DataObjects\{BusctlDataObject, StructDataObject};
+use Srhmster\PhpDbus\Tests\DataProviders\DataObjectDataProvider;
 use TypeError;
 
 /**
@@ -14,70 +16,17 @@ use TypeError;
 final class StructDataObjectTest extends TestCase
 {
     /**
-     * Valid data provider
-     *
-     * @return array
-     */
-    public function validDataProvider(): array
-    {
-        return [
-            [BusctlDataObject::s(), ['signature' => '(s)', 'value' => null]],
-            [
-                [BusctlDataObject::s('hello world'), BusctlDataObject::y(123)],
-                ['signature' => '(sy)', 'value' => '"hello world" 123'],
-            ],
-            [
-                [
-                    BusctlDataObject::r([
-                        BusctlDataObject::y(1),
-                        BusctlDataObject::b(true),
-                        BusctlDataObject::s('string'),
-                    ])
-                ],
-                ['signature' => '((ybs))', 'value' => '1 true "string"']
-            ],
-            [
-                [
-                    BusctlDataObject::a([
-                        BusctlDataObject::s('hello'),
-                        BusctlDataObject::s('world'),
-                    ]),
-                    BusctlDataObject::y(123),
-                ],
-                ['signature' => '(asy)', 'value' => '2 "hello" "world" 123']
-            ]
-        ];
-    }
-    
-    /**
-     * Invalid data provider
-     *
-     * @return array
-     */
-    public function invalidDataProvider(): array
-    {
-        return [
-            ['string'],
-            [123],
-            [12.3],
-            [true],
-            [[]],
-            [null],
-            [[BusctlDataObject::s('hello'), 'world']],
-        ];
-    }
-    
-    /**
      * Can be created from valid value
      *
-     * @dataProvider validDataProvider
+     * @see DataObjectDataProvider::validStructData()
      *
      * @param BusctlDataObject|BusctlDataObject[] $value
      * @param array $expected
      * @return void
      */
+    #[DataProviderExternal(DataObjectDataProvider::class, 'validStructData')]
     public function testCanBeCreatedFromValidValue(
-        $value,
+        BusctlDataObject|array $value,
         array $expected
     ): void
     {
@@ -94,12 +43,13 @@ final class StructDataObjectTest extends TestCase
     /**
      * Cannot be created from invalid value
      *
-     * @dataProvider invalidDataProvider
+     * @see DataObjectDataProvider::invalidStructData()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidStructData')]
+    public function testCannotBeCreatedFromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
         

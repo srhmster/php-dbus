@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Srhmster\PhpDbus\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
-use Srhmster\PhpDbus\DataObjects\{BusctlDataObject, NumericDataObject};
+use Srhmster\PhpDbus\DataObjects\{BusctlDataObject, NumericDataObject, NumericSignature};
+use Srhmster\PhpDbus\Tests\DataProviders\DataObjectDataProvider;
 use TypeError;
 
 /**
@@ -14,71 +16,21 @@ use TypeError;
 final class NumericDataObjectTest extends TestCase
 {
     /**
-     * Valid integer data provider
-     *
-     * @return array
-     */
-    public function validIntegerDataProvider(): array
-    {
-        return [
-            [123, ['value' => 123]],
-            [null, ['value' => null]],
-        ];
-    }
-
-    /**
-     * Valid double data provider
-     *
-     * @return array
-     */
-    public function validDoubleDataProvider(): array
-    {
-        return [
-            [12.3, ['value' => 12.3]],
-            [null, ['value' => null]],
-        ];
-    }
-    
-    /**
-     * Invalid data provider
-     *
-     * @return array
-     */
-    public function invalidDataProvider(): array
-    {
-        return [
-            ['string'],
-            [true],
-            [[]],
-            [BusctlDataObject::y(123)],
-        ];
-    }
-
-    /**
-     * Invalid integer data provider
-     *
-     * @return array
-     */
-    public function invalidIntegerDataProvider(): array
-    {
-        return [[12.3]];
-    }
-    
-    /**
      * Can be created from valid integer value
      *
-     * @dataProvider validIntegerDataProvider
+     * @see DataObjectDataProvider::validIntegerDataForNumeric()
      *
      * @param int|null $value
      * @param array $expected
      * @return void
      */
+    #[DataProviderExternal(DataObjectDataProvider::class, 'validIntegerDataForNumeric')]
     public function testCanBeCreatedFromValidIntValue(
         ?int $value,
         array $expected
     ): void
     {
-        foreach ($this->getIntSignatures() as $signature) {
+        foreach (NumericSignature::onlyIntegerValues() as $signature) {
             /**
              * @see BusctlDataObject::y()
              * @see BusctlDataObject::n()
@@ -104,12 +56,13 @@ final class NumericDataObjectTest extends TestCase
     /**
      * Can be created from valid double value
      *
-     * @dataProvider validDoubleDataProvider
+     * @see DataObjectDataProvider::validDoubleDataForNumeric()
      *
      * @param float|null $value
      * @param array $expected
      * @return void
      */
+    #[DataProviderExternal(DataObjectDataProvider::class, 'validDoubleDataForNumeric')]
     public function testCanBeCreatedFromValidDoubleValue(
         ?float $value,
         array $expected
@@ -120,7 +73,7 @@ final class NumericDataObjectTest extends TestCase
         $this->assertInstanceOf(NumericDataObject::class, $object);
         $this->assertEquals($expected['value'], $object->getValue());
         $this->assertEquals(
-            NumericDataObject::DOUBLE_SIGNATURE . ' ' . $expected['value'],
+            NumericSignature::Double->value . ' ' . $expected['value'],
             $object->getValue(true)
         );
     }
@@ -128,13 +81,15 @@ final class NumericDataObjectTest extends TestCase
     /**
      * Cannot be created byte from invalid value
      *
-     * @dataProvider invalidDataProvider
-     * @dataProvider invalidIntegerDataProvider
+     * @see DataObjectDataProvider::invalidNumericData()
+     * @see DataObjectDataProvider::invalidIntegerDataForNumeric()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedByteFromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidNumericData')]
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidIntegerDataForNumeric')]
+    public function testCannotBeCreatedByteFromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
         
@@ -144,13 +99,15 @@ final class NumericDataObjectTest extends TestCase
     /**
      * Cannot be created int16 from invalid value
      *
-     * @dataProvider invalidDataProvider
-     * @dataProvider invalidIntegerDataProvider
+     * @see DataObjectDataProvider::invalidNumericData()
+     * @see DataObjectDataProvider::invalidIntegerDataForNumeric()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedInt16FromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidNumericData')]
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidIntegerDataForNumeric')]
+    public function testCannotBeCreatedInt16FromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
     
@@ -160,13 +117,15 @@ final class NumericDataObjectTest extends TestCase
     /**
      * Cannot be created uint16 from invalid value
      *
-     * @dataProvider invalidDataProvider
-     * @dataProvider invalidIntegerDataProvider
+     * @see DataObjectDataProvider::invalidNumericData()
+     * @see DataObjectDataProvider::invalidIntegerDataForNumeric()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedUint16FromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidNumericData')]
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidIntegerDataForNumeric')]
+    public function testCannotBeCreatedUint16FromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
     
@@ -176,13 +135,15 @@ final class NumericDataObjectTest extends TestCase
     /**
      * Cannot be created int32 from invalid value
      *
-     * @dataProvider invalidDataProvider
-     * @dataProvider invalidIntegerDataProvider
+     * @see DataObjectDataProvider::invalidNumericData()
+     * @see DataObjectDataProvider::invalidIntegerDataForNumeric()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedInt32FromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidNumericData')]
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidIntegerDataForNumeric')]
+    public function testCannotBeCreatedInt32FromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
     
@@ -192,13 +153,15 @@ final class NumericDataObjectTest extends TestCase
     /**
      * Cannot be created uint32 from invalid value
      *
-     * @dataProvider invalidDataProvider
-     * @dataProvider invalidIntegerDataProvider
+     * @see DataObjectDataProvider::invalidNumericData()
+     * @see DataObjectDataProvider::invalidIntegerDataForNumeric()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedUint32FromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidNumericData')]
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidIntegerDataForNumeric')]
+    public function testCannotBeCreatedUint32FromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
     
@@ -208,13 +171,15 @@ final class NumericDataObjectTest extends TestCase
     /**
      * Cannot be created int64 from invalid value
      *
-     * @dataProvider invalidDataProvider
-     * @dataProvider invalidIntegerDataProvider
+     * @see DataObjectDataProvider::invalidNumericData()
+     * @see DataObjectDataProvider::invalidIntegerDataForNumeric()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedInt64FromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidNumericData')]
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidIntegerDataForNumeric')]
+    public function testCannotBeCreatedInt64FromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
     
@@ -224,13 +189,15 @@ final class NumericDataObjectTest extends TestCase
     /**
      * Cannot be created uint64 from invalid value
      *
-     * @dataProvider invalidDataProvider
-     * @dataProvider invalidIntegerDataProvider
+     * @see DataObjectDataProvider::invalidNumericData()
+     * @see DataObjectDataProvider::invalidIntegerDataForNumeric()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedUint64FromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidNumericData')]
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidIntegerDataForNumeric')]
+    public function testCannotBeCreatedUint64FromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
     
@@ -240,34 +207,16 @@ final class NumericDataObjectTest extends TestCase
     /**
      * Cannot be created double from invalid value
      *
-     * @dataProvider invalidDataProvider
+     * @see DataObjectDataProvider::invalidNumericData()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedDoubleFromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidNumericData')]
+    public function testCannotBeCreatedDoubleFromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
     
         BusctlDataObject::d($value);
     }
-
-    /**
-     * Get integer signatures
-     *
-     * @return array
-     */
-    private function getIntSignatures(): array
-    {
-        return [
-            NumericDataObject::BYTE_SIGNATURE,
-            NumericDataObject::INT16_SIGNATURE,
-            NumericDataObject::UINT16_SIGNATURE,
-            NumericDataObject::INT32_SIGNATURE,
-            NumericDataObject::UINT32_SIGNATURE,
-            NumericDataObject::INT64_SIGNATURE,
-            NumericDataObject::UINT64_SIGNATURE,
-        ];
-    }
-
 }

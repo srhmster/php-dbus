@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Srhmster\PhpDbus\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use Srhmster\PhpDbus\DataObjects\{BooleanDataObject, BusctlDataObject};
+use Srhmster\PhpDbus\Tests\DataProviders\DataObjectDataProvider;
 use TypeError;
 
 /**
@@ -14,44 +16,15 @@ use TypeError;
 final class BooleanDataObjectTest extends TestCase
 {
     /**
-     * Valid data provider
-     *
-     * @return array
-     */
-    public function validDataProvider(): array
-    {
-        return [
-            [true, ['value' => 'true']],
-            [false, ['value' => 'false']],
-            [null, ['value' => null]],
-        ];
-    }
-    
-    /**
-     * Invalid data provider
-     *
-     * @return array
-     */
-    public function invalidDataProvider(): array
-    {
-        return [
-            ['string'],
-            [123],
-            [12.3],
-            [[]],
-            [BusctlDataObject::b(true)]
-        ];
-    }
-    
-    /**
      * Can be created from valid value
      *
-     * @dataProvider validDataProvider
+     * @see DataObjectDataProvider::validBooleanData()
      *
      * @param bool|null $value
      * @param array $expected
      * @return void
      */
+    #[DataProviderExternal(DataObjectDataProvider::class, 'validBooleanData')]
     public function testCanBeCreatedFromValidValue(
         ?bool $value,
         array $expected
@@ -70,12 +43,13 @@ final class BooleanDataObjectTest extends TestCase
     /**
      * Cannot be created from invalid value
      *
-     * @dataProvider invalidDataProvider
+     * @see DataObjectDataProvider::invalidBooleanData()
      *
      * @param mixed $value
      * @return void
      */
-    public function testCannotBeCreatedFromInvalidValue($value): void
+    #[DataProviderExternal(DataObjectDataProvider::class, 'invalidBooleanData')]
+    public function testCannotBeCreatedFromInvalidValue(mixed $value): void
     {
         $this->expectException(TypeError::class);
         

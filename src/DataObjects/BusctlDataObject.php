@@ -16,14 +16,14 @@ abstract class BusctlDataObject
      *
      * @var string
      */
-    protected $signature;
+    protected string $signature;
     
     /**
      * Data value
      *
      * @var mixed
      */
-    protected $value;
+    protected mixed $value;
     
     /**
      * Get data object signature
@@ -49,7 +49,7 @@ abstract class BusctlDataObject
      * @param string|null $value
      * @return StringDataObject
      */
-    public static function s(string $value = null): StringDataObject
+    public static function s(?string $value = null): StringDataObject
     {
         return new StringDataObject($value);
     }
@@ -61,7 +61,7 @@ abstract class BusctlDataObject
      * @return ObjectPathDataObject
      * @throws TypeError
      */
-    public static function o(string $value = null): ObjectPathDataObject
+    public static function o(?string $value = null): ObjectPathDataObject
     {
         return new ObjectPathDataObject($value);
     }
@@ -72,7 +72,7 @@ abstract class BusctlDataObject
      * @param bool|null $value
      * @return BooleanDataObject
      */
-    public static function b(bool $value = null): BooleanDataObject
+    public static function b(?bool $value = null): BooleanDataObject
     {
         return new BooleanDataObject($value);
     }
@@ -83,9 +83,9 @@ abstract class BusctlDataObject
      * @param int|null $value
      * @return NumericDataObject
      */
-    public static function y(int $value = null): NumericDataObject
+    public static function y(?int $value = null): NumericDataObject
     {
-        return new NumericDataObject(NumericDataObject::BYTE_SIGNATURE, $value);
+        return new NumericDataObject(NumericSignature::Byte, $value);
     }
     
     /**
@@ -94,12 +94,9 @@ abstract class BusctlDataObject
      * @param int|null $value
      * @return NumericDataObject
      */
-    public static function n(int $value = null): NumericDataObject
+    public static function n(?int $value = null): NumericDataObject
     {
-        return new NumericDataObject(
-            NumericDataObject::INT16_SIGNATURE,
-            $value
-        );
+        return new NumericDataObject(NumericSignature::Int16, $value);
     }
     
     /**
@@ -108,12 +105,9 @@ abstract class BusctlDataObject
      * @param int|null $value
      * @return NumericDataObject
      */
-    public static function q(int $value = null): NumericDataObject
+    public static function q(?int $value = null): NumericDataObject
     {
-        return new NumericDataObject(
-            NumericDataObject::UINT16_SIGNATURE,
-            $value
-        );
+        return new NumericDataObject(NumericSignature::UInt16, $value);
     }
     
     /**
@@ -122,12 +116,9 @@ abstract class BusctlDataObject
      * @param int|null $value
      * @return NumericDataObject
      */
-    public static function i(int $value = null): NumericDataObject
+    public static function i(?int $value = null): NumericDataObject
     {
-        return new NumericDataObject(
-            NumericDataObject::INT32_SIGNATURE,
-            $value
-        );
+        return new NumericDataObject(NumericSignature::Int32, $value);
     }
     
     /**
@@ -136,12 +127,9 @@ abstract class BusctlDataObject
      * @param int|null $value
      * @return NumericDataObject
      */
-    public static function u(int $value = null): NumericDataObject
+    public static function u(?int $value = null): NumericDataObject
     {
-        return new NumericDataObject(
-            NumericDataObject::UINT32_SIGNATURE,
-            $value
-        );
+        return new NumericDataObject(NumericSignature::UInt32, $value);
     }
     
     /**
@@ -150,12 +138,9 @@ abstract class BusctlDataObject
      * @param int|null $value
      * @return NumericDataObject
      */
-    public static function x(int $value = null): NumericDataObject
+    public static function x(?int $value = null): NumericDataObject
     {
-        return new NumericDataObject(
-            NumericDataObject::INT64_SIGNATURE,
-            $value
-        );
+        return new NumericDataObject(NumericSignature::Int64, $value);
     }
     
     /**
@@ -164,12 +149,9 @@ abstract class BusctlDataObject
      * @param int|null $value
      * @return NumericDataObject
      */
-    public static function t(int $value = null): NumericDataObject
+    public static function t(?int $value = null): NumericDataObject
     {
-        return new NumericDataObject(
-            NumericDataObject::UINT64_SIGNATURE,
-            $value
-        );
+        return new NumericDataObject(NumericSignature::UInt64, $value);
     }
     
     /**
@@ -178,12 +160,9 @@ abstract class BusctlDataObject
      * @param float|null $value
      * @return NumericDataObject
      */
-    public static function d(float $value = null): NumericDataObject
+    public static function d(?float $value = null): NumericDataObject
     {
-        return new NumericDataObject(
-            NumericDataObject::DOUBLE_SIGNATURE,
-            $value
-        );
+        return new NumericDataObject(NumericSignature::Double, $value);
     }
     
     /**
@@ -204,7 +183,7 @@ abstract class BusctlDataObject
      * @return StructDataObject
      * @throws TypeError
      */
-    public static function r($value): StructDataObject
+    public static function r(BusctlDataObject|array $value): StructDataObject
     {
         return new StructDataObject($value);
     }
