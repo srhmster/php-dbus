@@ -23,20 +23,12 @@ interface Marshaller
     /**
      * Convert Dbus data to PHP format
      *
-     * @param string $signature Description of the data structure
-     * @param array $data
+     * @param string|array $data
+     * @param string|null $signature Description of the data structure
      * @return array|string|int|float|bool|null
      */
     public function unmarshal(
-        string $signature,
-        array &$data
+        string|array &$data,
+        ?string $signature = null
     ): array|string|int|float|bool|null;
-    
-    /**
-     * Prepare data for the unmarshalling process
-     *
-     * @param mixed $data
-     * @return array
-     */
-    public function unmarshallingPrepare(mixed $data): array;
 }

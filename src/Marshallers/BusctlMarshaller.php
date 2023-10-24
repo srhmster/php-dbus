@@ -70,30 +70,39 @@ class BusctlMarshaller implements Marshaller
      * @inheritdoc
      */
     public function unmarshal(
-        string $signature,
-        array &$data
+        string|array &$data,
+        ?string $signature = null
     ): array|string|int|float|bool|null
     {
+        // Prepare data before unmarshalling
+        if (is_string($data)) {
+            list($signature, $data) = $this->prepare($data);
+            
+            return $this->unmarshal($data, $signature);
+        }
+        
         // Unmarshal base types
         if (strlen($signature) === 1) {
+            $item = array_shift($data);
+            if (is_null($item)) return null;
+            
             return match ($signature) {
                 StringDataObject::SIGNATURE,
-                ObjectPathDataObject::SIGNATURE =>
-                    str_replace('"', '', array_shift($data)),
+                ObjectPathDataObject::SIGNATURE => str_replace('"', '', $item),
                 NumericSignature::Byte->value,
                 NumericSignature::Int16->value,
                 NumericSignature::UInt16->value,
                 NumericSignature::Int32->value,
                 NumericSignature::UInt32->value,
                 NumericSignature::Int64->value,
-                NumericSignature::UInt64->value => (int)array_shift($data),
-                NumericSignature::Double->value => (float)array_shift($data),
-                BooleanDataObject::SIGNATURE => array_shift($data) === 'true',
-                VariantDataObject::SIGNATURE =>
-                    $this->unmarshal(array_shift($data), $data),
-                default => null
+                NumericSignature::UInt64->value => (int)$item,
+                NumericSignature::Double->value => (float)$item,
+                BooleanDataObject::SIGNATURE => $item === 'true',
+                VariantDataObject::SIGNATURE => $this->unmarshal($data, $item),
+                default => throw new TypeError('Unknown signature specified')
             };
         }
+        
         // Unmarshal sequence base types or container types
         $response = [];
         $position = 0;
@@ -110,7 +119,7 @@ class BusctlMarshaller implements Marshaller
                             $pEnd - ($position + 1)
                         );
                 
-                    $value = $this->unmarshal($subtype, $data);
+                    $value = $this->unmarshal($data, $subtype);
                 
                     // Check if type is unique in signature
                     if ($position === 0 && $pEnd === (strlen($signature) - 1)) {
@@ -140,12 +149,12 @@ class BusctlMarshaller implements Marshaller
                     for ($i = 0; $i < $countItems; $i++) {
                         if ($nextChar === '{') {
                             $key = $this->unmarshal(
-                                substr($signature, $stPosition['start'] - 1, 1),
-                                $data
+                                $data,
+                                substr($signature, $stPosition['start'] - 1, 1)
                             );
-                            $items[$key] = $this->unmarshal($subtype, $data);
+                            $items[$key] = $this->unmarshal($data, $subtype);
                         } else {
-                            $items[] = $this->unmarshal($subtype, $data);
+                            $items[] = $this->unmarshal($data, $subtype);
                         }
                     }
                 
@@ -163,10 +172,7 @@ class BusctlMarshaller implements Marshaller
                 
                     break;
                 default:
-                    $response[] = $this->unmarshal(
-                        $signature[$position],
-                        $data
-                    );
+                    $response[] = $this->unmarshal($data, $signature[$position]);
             }
         
             $position++;
@@ -176,7 +182,7 @@ class BusctlMarshaller implements Marshaller
     }
     
     /**
-     * Prepare data for the unmarshalling process
+     * Prepare data before unmarshalling
      *
      * Replacing spaces inside string values so that a data array can be
      * formed correctly
@@ -184,19 +190,19 @@ class BusctlMarshaller implements Marshaller
      * @param string $data
      * @return array
      */
-    public function unmarshallingPrepare(mixed $data): array
+    private function prepare(string $data): array
     {
         preg_match_all('/\".*\"/U', $data, $matches);
-        
+    
         $replaced = [];
         foreach ($matches[0] as $match) {
             if (!preg_match('/\s/', $match)) continue;
-    
+        
             $tmp = str_replace(' ', '-', $match);
             $replaced[$tmp] = $match;
             $data = str_replace($match, $tmp, $data);
         }
-    
+        
         $preparedData = explode(' ', $data);
         array_walk($preparedData, function (&$value, $key, $replaced) {
             if (isset($replaced[$value])) {
@@ -204,7 +210,10 @@ class BusctlMarshaller implements Marshaller
             }
         }, $replaced);
         
-        return $preparedData;
+        return [
+            array_shift($preparedData),
+            $preparedData
+        ];
     }
     
     /**
@@ -219,32 +228,20 @@ class BusctlMarshaller implements Marshaller
         int $pStart
     ): array
     {
-        $position = [];
-        
-        switch ($signature[$pStart + 1]) {
-            case '(':
-                $position['start'] = $pStart + 1;
-                $position['end'] = strripos($signature, ')');
-                
-                break;
-            case '{':
-                $position['start'] = $pStart + 3;
-                $position['end'] = strripos($signature, '}') - 1;
-                
-                break;
-            case ArrayDataObject::SIGNATURE:
-                $position['start'] = $pStart + 1;
-                $position['end'] = $this->findArraySubtypePosition(
-                        $signature,
-                        $position['start']
-                    )['end'] + 1;
-                
-                break;
-            default:
-                $position['start'] = $pStart + 1;
-                $position['end'] = $pStart + 1;
-        }
-        
-        return $position;
+        return match ($signature[$pStart + 1]) {
+            '(' => ['start' => $pStart + 1, 'end' => strripos($signature, ')')],
+            '{' => [
+                'start' => $pStart + 3,
+                'end' => strripos($signature, '}') - 1
+            ],
+            ArrayDataObject::SIGNATURE => [
+                'start' => $pStart + 1,
+                'end' => $this->findArraySubtypePosition(
+                    $signature,
+                    $pStart + 1
+                )['end'] + 1,
+            ],
+            default => ['start' => $pStart + 1, 'end' => $pStart + 1]
+        };
     }
 }
