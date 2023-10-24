@@ -85,13 +85,13 @@ final class MarshallerDataProvider
     public static function validUnmarshallingData(): array
     {
         return [
-            ['e', [], null],
-            ['s', ['"hello"'], 'hello'],
-            ['su', ['"hello"', 123], ['hello', 123]],
-            ['ay', [3, 1, 2, 3], [1, 2, 3]],
+            ['s', null],
+            ['as 0', []],
+            ['s "hello world"', 'hello world'],
+            ['su "hello world" 123', ['hello world', 123]],
+            ['ay 3 1 2 3', [1, 2, 3]],
             [
-                'a{sa{sv}}',
-                [1, '"key"', 1, '"item"', 'y', 123],
+                'a{sa{sv}} 1 "key" 1 "item" y 123',
                 ['key' => ['item' => 123]]
             ],
         ];
@@ -122,15 +122,12 @@ final class MarshallerDataProvider
     public static function invalidUnmarshallingData(): array
     {
         return [
-            [null, []],
-            [123, []],
-            [true, []],
-            [[], []],
-            [new stdClass(), []],
-            ['s', null],
-            ['s', 123],
-            ['s', true],
-            ['s', new stdClass()],
+            [null],
+            [123],
+            [true],
+            [[]],
+            [new stdClass()],
+            ['sp "hello world" 123'],
         ];
     }
 }

@@ -59,22 +59,20 @@ final class BusctlMarshallerTest extends TestCase
      *
      * @see MarshallerDataProvider::validUnmarshallingData()
      *
-     * @param string $signature
-     * @param array $data
+     * @param string $data
      * @param mixed $expected
      * @return void
      */
     #[DataProviderExternal(MarshallerDataProvider::class, 'validUnmarshallingData')]
     public function testCanBeUnmarshalledFromValidData(
-        string $signature,
-        array $data,
+        string $data,
         mixed $expected
     ): void
     {
         $marshaller = new BusctlMarshaller();
 
         $this->assertInstanceOf(Marshaller::class, $marshaller);
-        $this->assertEquals($expected, $marshaller->unmarshal($signature, $data));
+        $this->assertEquals($expected, $marshaller->unmarshal($data));
     }
 
     /**
@@ -82,19 +80,17 @@ final class BusctlMarshallerTest extends TestCase
      *
      * @see MarshallerDataProvider::invalidUnmarshallingData()
      *
-     * @param mixed $signature
      * @param mixed $data
      * @return void
      */
     #[DataProviderExternal(MarshallerDataProvider::class, 'invalidUnmarshallingData')]
     public function testCannotBeUnmarshalledFromInvalidData(
-        mixed $signature,
         mixed $data
     ): void
     {
         $this->expectException(TypeError::class);
-
+        
         $marshaller = new BusctlMarshaller();
-        $marshaller->unmarshal($signature, $data);
+        $marshaller->unmarshal($data);
     }
 }

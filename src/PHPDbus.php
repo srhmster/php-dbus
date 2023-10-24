@@ -91,14 +91,9 @@ class PHPDbus
                 $this->marshaller->marshal($properties)
             ]);
 
-        if (!is_null($response)) {
-            $data = $this->marshaller->unmarshallingPrepare($response);
-            $signature = array_shift($data);
-
-            return $this->marshaller->unmarshal($signature, $data);
-        }
-
-        return null;
+        return is_null($response)
+            ? $response
+            : $this->marshaller->unmarshal($response);
     }
 
     /**
@@ -165,14 +160,9 @@ class PHPDbus
                 $name
             ]);
         
-        if (!is_null($response)) {
-            $data = $this->marshaller->unmarshallingPrepare($response);
-            $signature = array_shift($data);
-            
-            return $this->marshaller->unmarshal($signature, $data);
-        }
-        
-        return null;
+        return is_null($response)
+            ? $response
+            : $this->marshaller->unmarshal($response);
     }
     
     /**
